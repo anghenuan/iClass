@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师仪表板 - 班级操行分系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.5rem;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        nav {
+            background-color: #2c3e50;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        nav li {
+            flex: 1;
+        }
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        nav a:hover, nav a.active {
+            background-color: #34495e;
+            border-bottom-color: #667eea;
+        }
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .record-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .record-item.add {
+            border-left: 4px solid #27ae60;
+        }
+        .record-item.deduct {
+            border-left: 4px solid #e74c3c;
+        }
+        .record-type {
+            font-weight: bold;
+            width: 80px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .record-type.add {
+            background-color: #d5f4e6;
+            color: #27ae60;
+        }
+        .record-type.deduct {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        .record-score {
+            font-weight: bold;
+            width: 60px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .record-reason {
+            flex: 1;
+            margin: 0 1rem;
+        }
+        .record-time {
+            color: #666;
+            font-size: 0.9rem;
+            width: 180px;
+            text-align: right;
+        }
+        .record-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+        .record-status.pending {
+            background-color: #f39c12;
+            color: white;
+        }
+        .record-status.approved {
+            background-color: #27ae60;
+            color: white;
+        }
+        .record-status.rejected {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .logout-btn {
+            background: #e74c3c;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin: 0 0.25rem;
+        }
+        .action-btn.approve {
+            background: #27ae60;
+        }
+        .action-btn.reject {
+            background: #e74c3c;
+        }
+        .action-btn.view {
+            background: #3498db;
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .close:hover {
+            color: #333;
+        }
+        .export-btn {
+            background: #27ae60;
+            margin-bottom: 1.5rem;
+        }
+        .export-btn:hover {
+            background: #219653;
+        }
+        /* 在现有CSS中添加以下样式 */
+
+.rank-item {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.rank-position {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+  width: 50px;
+  text-align: center;
+}
+
+.rank-class {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.rank-score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.rank-students {
+  margin-top: 1rem;
+}
+
+.student-rank-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.student-rank-item:last-child {
+  border-bottom: none;
+}
+
+.student-name {
+  flex: 1;
+}
+
+.student-score {
+  font-weight: bold;
+  color: #333;
+}
+
+    .top-rank {
+      border-left: 4px solid #FFD700;
+    }
+
+    .second-rank {
+      border-left: 4px solid #C0C0C0;
+    }
+
+    .third-rank {
+      border-left: 4px solid #CD7F32;
+    }
+
+    .rank-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+
+    .rank-1 {
+      background-color: #FFD700;
+      color: #333;
+    }
+
+    .rank-2 {
+      background-color: #C0C0C0;
+      color: #333;
+    }
+
+    .rank-3 {
+      background-color: #CD7F32;
+      color: white;
+    }
+
+    /* 申请详情样式 */
+.application-details {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.detail-item {
+    display: flex;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.detail-item label {
+    font-weight: bold;
+    width: 100px;
+    margin: 0;
+    color: #495057;
+}
+
+.detail-item span {
+    flex: 1;
+    color: #212529;
+}
+
+.detail-item.full-width {
+    flex-direction: column;
+}
+
+.detail-item.full-width label {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.reason-text {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    line-height: 1.5;
+}
+
+/* 凭证图片样式 */
+.evidence-container {
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.evidence-image {
+    max-height: 100px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.evidence-image:hover {
+    transform: scale(1.02);
+}
+
+.confirm-text {
+    text-align: center;
+    margin: 1.5rem 0;
+    font-size: 1.1rem;
+    color: #495057;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>班级操行分系统 - 教师端</h1>
+        <div class="user-info">
+            <span id="teacherName"></span>
+            <button id="logoutBtn" class="logout-btn">退出登录</button>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#" class="nav-link active" data-page="students">学生分数</a></li>
+            <li><a href="#" class="nav-link" data-page="adjust">分数调整</a></li>
+            <li><a href="#" class="nav-link" data-page="applications">审核申请</a></li>
+            <li><a href="#" class="nav-link" data-page="ranks">小组排名</a></li>
+            <li><a href="#" class="nav-link" data-page="export">导出数据</a></li>
+            <li><a href="#" class="nav-link" data-page="settings">设置</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <!-- 学生分数页面 -->
+        <div id="students-page" class="page active">
+            <h2 class="section-title">学生分数总览</h2>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>当前分数</th>
+                        <th>最近操作</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- 动态填充 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 分数调整页面 -->
+        <!-- 添加小组排名页面 -->
+<div id="ranks-page" class="page">
+  <h2 class="section-title">小组排名</h2>
+  <div id="classRanksContainer">
+    <div class="empty-state">加载中...</div>
+  </div>
+</div>
+
+<!-- 更新分数调整表单 -->
+<div id="adjust-page" class="page">
+  <h2 class="section-title">直接调整学生分数</h2>
+  <form id="adjustForm">
+    <div class="form-group">
+      <label for="adjustStudent">选择学生</label>
+      <select id="adjustStudent" name="studentId" required>
+        <option value="">请选择学生</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="adjustType">调整类型</label>
+      <select id="adjustType" name="type" required>
+        <option value="add">加分</option>
+        <option value="deduct">扣分</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="adjustScore">分数</label>
+      <input type="number" id="adjustScore" name="score" min="1" required>
+    </div>
+    <div class="form-group">
+      <label for="adjustSubject">科目</label>
+      <select id="adjustSubject" name="subject">
+        <option value="非学科性">非学科性</option>
+        <option value="语文">语文</option>
+        <option value="数学">数学</option>
+        <option value="英语">英语</option>
+        <option value="物理">物理</option>
+        <!--<option value="化学">化学</option>-->
+        <option value="生物">生物</option>
+        <option value="历史">历史</option>
+        <option value="地理">地理</option>
+        <option value="政治">政治</option>
+        <option value="体育">体育</option>
+        <option value="信息技术">信息技术</option>
+        <option value="常规">常规</option>
+        <option value="学习">学习</option>
+        <option value="生活">生活</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="adjustReason">选择原因</label>
+      <select id="adjustReason" name="reason">
+        <option value="">请选择原因</option>
+        <!-- 原因选项将通过JavaScript动态加载 -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="customReason">或输入自定义原因</label>
+      <input type="text" id="customReason" name="customReason" placeholder="如需其他原因，请在此输入">
+    </div>
+    <button type="submit">提交调整</button>
+  </form>
+</div>
+        
+        <!-- 审核申请页面 -->
+        <div id="applications-page" class="page">
+            <h2 class="section-title">待审核申请</h2>
+            <div id="pendingApplications">
+                <div class="empty-state">暂无待审核申请</div>
+            </div>
+        </div>
+        
+        <!-- 导出数据页面 -->
+        <div id="export-page" class="page">
+            <h2 class="section-title">导出学生分数数据</h2>
+            <p>点击下方按钮导出本周学生加分扣分情况（Excel格式）</p>
+            <button id="exportBtn" class="export-btn">导出Excel</button>
+        </div>
+        
+        <!-- 设置页面 -->
+        <div id="settings-page" class="page">
+            <h2 class="section-title">修改密码</h2>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="oldPassword">原密码</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">新密码</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">确认新密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit">修改密码</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- 学生详情模态框 -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalStudentName">学生详情</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div id="modalStudentContent">
+                <!-- 动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 审核申请模态框 -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>审核申请</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div id="reviewModalContent">
+                <!-- 动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取教师信息
+        const teacherInfo = JSON.parse(localStorage.getItem('teacherInfo'));
+        const token = localStorage.getItem('teacherToken');
+        
+        if (!token || !teacherInfo) {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('teacherName').textContent = `${teacherInfo.name} (${teacherInfo.subject})`;
+        
+        // 页面导航
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.add('active');
+                
+                // 加载对应页面数据
+                if (this.getAttribute('data-page') === 'students') {
+                    loadStudentsData();
+                } else if (this.getAttribute('data-page') === 'adjust') {
+                    loadStudentsForAdjust();
+                } else if (this.getAttribute('data-page') === 'applications') {
+                    loadPendingApplications();
+                }
+            });
+        });
+        
+        // 加载学生数据
+        function loadStudentsData() {
+            fetch('/api/teacher/students-scores', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const tbody = document.getElementById('studentsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">暂无学生数据</td></tr>';
+                        return;
+                    }
+                    
+                    data.data.forEach(student => {
+                        const lastRecord = student.records.length > 0 ? student.records[0] : null;
+                        const lastOperation = lastRecord ? 
+                            `${lastRecord.type === 'add' ? '加分' : '扣分'} ${lastRecord.score}分 (${lastRecord.reason})` : 
+                            '无记录';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student.id}</td>
+                            <td>${student.name}</td>
+                            <td>${student.currentScore}</td>
+                            <td>${lastOperation}</td>
+                            <td>
+                                <button class="action-btn view" data-id="${student.id}">查看详情</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // 添加查看详情事件
+                    document.querySelectorAll('.view').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const studentId = this.getAttribute('data-id');
+                            showStudentDetails(studentId, data.data);
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('加载学生数据错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('teacherToken');
+                    localStorage.removeItem('teacherInfo');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 显示学生详情
+        function showStudentDetails(studentId, studentsData) {
+            const student = studentsData.find(s => s.id === studentId);
+            if (!student) return;
+            
+            document.getElementById('modalStudentName').textContent = `${student.name} (${student.id}) - 当前分数: ${student.currentScore}`;
+            
+            let recordsHtml = '';
+            if (student.records.length > 0) {
+                recordsHtml = student.records.map(record => `
+                    <div class="record-item ${record.type}">
+                        <span class="record-type ${record.type}">${record.type === 'add' ? '加分' : '扣分'}</span>
+                        <span class="record-score">${record.type === 'add' ? '+' : '-'}${record.score}</span>
+                        <span class="record-reason">${record.reason}</span>
+                        <span class="record-time">${new Date(record.timestamp).toLocaleString()}</span>
+                    </div>
+                `).join('');
+            } else {
+                recordsHtml = '<div class="empty-state">暂无记录</div>';
+            }
+            
+            document.getElementById('modalStudentContent').innerHTML = `
+                <h4>分数记录</h4>
+                <div>${recordsHtml}</div>
+            `;
+            
+            document.getElementById('studentModal').style.display = 'flex';
+        }
+        
+        // 加载学生列表用于调整分数
+        function loadStudentsForAdjust() {
+            fetch('/api/teacher/students-scores', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById('adjustStudent');
+                    select.innerHTML = '<option value="">请选择学生</option>';
+                    
+                    data.data.forEach(student => {
+                        const option = document.createElement('option');
+                        option.value = student.id;
+                        option.textContent = `${student.name} (${student.id}) - 当前分数: ${student.currentScore}`;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('加载学生列表错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('teacherToken');
+                    localStorage.removeItem('teacherInfo');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 提交分数调整
+document.getElementById('adjustForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const reason = formData.get('customReason') || formData.get('reason');
+    
+    // 验证原因是否填写
+    if (!reason) {
+        alert('请选择原因或输入自定义原因');
+        return;
+    }
+    
+    const data = {
+        studentId: formData.get('studentId'),
+        type: formData.get('type'),
+        score: parseInt(formData.get('score')),
+        reason: reason,
+        subject: formData.get('subject')
+    };
+    
+    // 添加加载状态
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = '提交中...';
+    submitButton.disabled = true;
+    
+    fetch('/api/teacher/adjust-score', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('分数调整成功');
+            this.reset();
+            // 重新加载学生列表
+            loadStudentsForAdjust();
+        } else {
+            alert('分数调整失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('分数调整错误:', error);
+        alert('分数调整失败，请重试');
+    })
+    .finally(() => {
+        // 恢复按钮状态
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+    });
+});
+        
+        // 加载待审核申请
+        function loadPendingApplications() {
+            fetch('/api/teacher/pending-applications', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('pendingApplications');
+                    
+                    if (data.data.length === 0) {
+                        container.innerHTML = '<div class="empty-state">暂无待审核申请</div>';
+                        return;
+                    }
+                    
+                    const applicationsHtml = data.data.map(application => `
+                        <div class="record-item ${application.type}">
+                            <span class="record-type ${application.type}">${application.type === 'add' ? '加分' : '扣分'}申请</span>
+                            <span class="record-score">${application.type === 'add' ? '+' : '-'}${application.score}</span>
+                            <span class="record-reason">${application.reason}</span>
+                            <span class="record-time">${new Date(application.timestamp).toLocaleString()}</span>
+                            <span>${application.studentName} - ${application.subject}</span>
+                            <div class="btn-group">
+                                <button class="action-btn approve" data-id="${application.id}">通过</button>
+                                <button class="action-btn reject" data-id="${application.id}">拒绝</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    container.innerHTML = applicationsHtml;
+                    
+                    // 添加审核事件
+                    document.querySelectorAll('.approve').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const applicationId = this.getAttribute('data-id');
+                            showReviewModal(applicationId, 'approve', data.data);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.reject').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const applicationId = this.getAttribute('data-id');
+                            showReviewModal(applicationId, 'reject', data.data);
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('加载待审核申请错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('teacherToken');
+                    localStorage.removeItem('teacherInfo');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 显示审核模态框
+        // 显示审核模态框
+function showReviewModal(applicationId, action, applicationsData) {
+    const application = applicationsData.find(a => a.id === applicationId);
+    if (!application) return;
+    
+    let modalContent = `
+        <div class="application-details">
+            <div class="detail-item">
+                <label>学生:</label>
+                <span>${application.studentName || application.studentId}</span>
+            </div>
+            <div class="detail-item">
+                <label>类型:</label>
+                <span>${application.type === 'add' ? '加分' : '扣分'}</span>
+            </div>
+            <div class="detail-item">
+                <label>科目:</label>
+                <span>${application.subject}</span>
+            </div>
+            <div class="detail-item">
+                <label>申请分数:</label>
+                <span>${application.score}分</span>
+            </div>
+    `;
+    
+    // 添加凭证图片显示
+    if (application.evidence) {
+        modalContent += `
+            <div class="detail-item full-width">
+                <label>凭证图片:</label>
+                <a href="/applications/${application.id}/${application.evidence}" target="_blank">
+                    <div class="evidence-container">
+                        <img src="/applications/${application.id}/${application.evidence}" alt="申请凭证" class="evidence-image" onerror="this.style.display='none'">
+                    </div>
+                </a>
+            </div>
+        `;
+    }else{
+        modalContent += `
+            <div class="detail-item full-width">
+                <label>原因:</label>
+                <div class="reason-text">${application.reason}</div>
+            </div>
+        `;
+    }
+    
+    modalContent += `</div>`;
+    
+    if (action === 'approve') {
+        modalContent += `
+            <div class="form-group">
+                <label for="reviewScore">审核分数</label>
+                <input type="number" id="reviewScore" value="${application.score}" min="1">
+            </div>
+            <div class="btn-group">
+                <button id="confirmApprove" class="action-btn approve">确认通过</button>
+                <button class="action-btn close-modal">取消</button>
+            </div>
+        `;
+    } else {
+        modalContent += `
+            <p class="confirm-text">确认拒绝此申请吗？</p>
+            <div class="btn-group">
+                <button id="confirmReject" class="action-btn reject">确认拒绝</button>
+                <button class="action-btn close-modal">取消</button>
+            </div>
+        `;
+    }
+    
+    document.getElementById('reviewModalContent').innerHTML = modalContent;
+    document.getElementById('reviewModal').style.display = 'flex';
+    
+    // 确认审核事件
+    if (action === 'approve') {
+        document.getElementById('confirmApprove').addEventListener('click', function() {
+            const score = document.getElementById('reviewScore').value;
+            submitReview(applicationId, 'approve', score);
+        });
+    } else {
+        document.getElementById('confirmReject').addEventListener('click', function() {
+            submitReview(applicationId, 'reject');
+        });
+    }
+    
+    // 关闭模态框事件
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('reviewModal').style.display = 'none';
+        });
+    });
+}
+        
+        // 提交审核
+        function submitReview(applicationId, action, score) {
+            const data = {
+                applicationId,
+                action
+            };
+            
+            if (action === 'approve' && score) {
+                data.score = parseInt(score);
+            }
+            
+            fetch('/api/teacher/review-application', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`申请已${action === 'approve' ? '通过' : '拒绝'}`);
+                    document.getElementById('reviewModal').style.display = 'none';
+                    loadPendingApplications();
+                } else {
+                    alert('审核失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('审核错误:', error);
+                alert('审核失败，请重试');
+            });
+        }
+        
+        // 导出Excel
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            fetch('/api/teacher/export-scores', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                
+                // 生成文件名
+                const currentWeek = getWeekNumber(new Date());
+                a.download = `学生操行分_第${currentWeek}周.xlsx`;
+                
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
+            .catch(error => {
+                console.error('导出错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('teacherToken');
+                    localStorage.removeItem('teacherInfo');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('导出失败，请重试');
+                }
+            });
+        });
+        
+        // 修改密码
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('新密码与确认密码不一致');
+                return;
+            }
+            
+            fetch('/api/teacher/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ oldPassword, newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('密码修改成功');
+                    this.reset();
+                } else {
+                    alert('密码修改失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('修改密码错误:', error);
+                alert('密码修改失败，请重试');
+            });
+        });
+        
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('teacherToken');
+            localStorage.removeItem('teacherInfo');
+            window.location.href = 'login.html';
+        });
+        
+        // 关闭模态框
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+        
+        // 获取周数辅助函数
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+        
+        // 在教师端JavaScript中添加以下功能
+
+// 页面导航中添加排名页面
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 移除所有活动状态
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    
+    // 添加当前活动状态
+    this.classList.add('active');
+    const pageId = this.getAttribute('data-page') + '-page';
+    document.getElementById(pageId).classList.add('active');
+    
+    // 加载对应页面数据
+    if (this.getAttribute('data-page') === 'students') {
+      loadStudentsData();
+    } else if (this.getAttribute('data-page') === 'adjust') {
+      loadStudentsForAdjust();
+      loadReasons(); // 加载预定义原因
+    } else if (this.getAttribute('data-page') === 'applications') {
+      loadPendingApplications();
+    } else if (this.getAttribute('data-page') === 'ranks') {
+      loadClassRanks();
+    }
+  });
+});
+
+// 加载小组排名
+function loadClassRanks() {
+  fetch('/api/teacher/class-ranks', {
+    headers: {
+      'Authorization': token
+    }
+  })
+  .then(response => {
+    if (response.status === 401) {
+      throw new Error('认证失效');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      const container = document.getElementById('classRanksContainer');
+      
+      if (data.data.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无小组数据</div>';
+        return;
+      }
+      
+      const ranksHtml = data.data.map(classRank => {
+        let rankClass = '';
+        if (classRank.rank === 1) rankClass = 'top-rank';
+        else if (classRank.rank === 2) rankClass = 'second-rank';
+        else if (classRank.rank === 3) rankClass = 'third-rank';
+        
+        const studentsHtml = classRank.students.map((student, index) => `
+          <div class="student-rank-item">
+            <span class="student-name">${index + 1}. ${student.name}</span>
+            <span class="student-score">${student.score}分</span>
+          </div>
+        `).join('');
+        
+        return `
+          <div class="rank-item ${rankClass}">
+            <div class="rank-header">
+              <div class="rank-position">
+                <span class="rank-badge rank-${classRank.rank}">第${classRank.rank}名</span>
+              </div>
+              <div class="rank-class">${classRank.className}</div>
+              <div class="rank-score">平均分: ${classRank.averageScore}</div>
+            </div>
+            <div class="rank-students">
+              ${studentsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = ranksHtml;
+    }
+  })
+  .catch(error => {
+    console.error('加载小组排名错误:', error);
+    if (error.message === '认证失效') {
+      localStorage.removeItem('teacherToken');
+      localStorage.removeItem('teacherInfo');
+      window.location.href = 'login.html';
+    }
+  });
+}
+
+// 加载预定义原因
+function loadReasons() {
+  fetch('/api/teacher/reasons', {
+    headers: {
+      'Authorization': token
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const reasonSelect = document.getElementById('adjustReason');
+      reasonSelect.innerHTML = '<option value="">请选择原因</option>';
+      
+      data.data.forEach(reason => {
+        const option = document.createElement('option');
+        option.value = reason;
+        option.textContent = reason;
+        reasonSelect.appendChild(option);
+      });
+    }
+  })
+  .catch(error => {
+    console.error('加载原因列表错误:', error);
+  });
+}
+
+        // 初始加载学生数据
+        loadStudentsData();
+    </script>
+</body>
+</html>
