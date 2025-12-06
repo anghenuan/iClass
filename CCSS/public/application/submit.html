@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交加分申请 - 班级操行分系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #4CAF50;
+        }
+        .upload-area.dragover {
+            border-color: #4CAF50;
+            background-color: #f9f9f9;
+        }
+        .upload-icon {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .preview-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .camera-container {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        #cameraPreview {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .camera-controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .camera-controls button {
+            width: auto;
+            padding: 0.5rem 1rem;
+        }
+        .error {
+            color: red;
+            margin-top: 0.5rem;
+        }
+        .success {
+            color: #4CAF50;
+            margin-top: 0.5rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>提交加分申请</h1>
+        <form id="applicationForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="studentName">学生姓名</label>
+                <input type="text" id="studentName" name="studentName" required>
+            </div>
+            <div class="form-group">
+                <label for="studentId">学号</label>
+                <input type="text" id="studentId" name="studentId" required>
+            </div>
+            <div class="form-group">
+                <label for="subject">加分科目</label>
+                <select id="subject" name="subject" required>
+                    <option value="">请选择科目</option>
+                    <option value="非学科性">非学科性</option>
+                    <option value="语文">语文</option>
+                    <option value="数学">数学</option>
+                    <option value="英语">英语</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                    <option value="生物">生物</option>
+                    <option value="历史">历史</option>
+                    <option value="地理">地理</option>
+                    <option value="政治">政治</option>
+                    <option value="体育">体育</option>
+                    <option value="信息技术">信息技术</option>
+                    <option value="常规">常规</option>
+                    <option value="学习">学习</option>
+                    <option value="生活">生活</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>凭证上传（可选）</label>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p>点击选择文件或拖拽文件到这里</p>
+                    <p class="small">支持 JPG, PNG 格式，最大 5MB</p>
+                </div>
+                <input type="file" id="evidenceFile" name="evidence" accept="image/*" class="hidden">
+                <div class="preview-container" id="previewContainer"></div>
+                
+                <div class="camera-container">
+                    <button type="button" id="toggleCameraBtn">打开摄像头拍照</button>
+                    <video id="cameraPreview" class="hidden" autoplay playsinline></video>
+                    <div class="camera-controls hidden" id="cameraControls">
+                        <button type="button" id="captureBtn">拍照</button>
+                        <button type="button" id="cancelCameraBtn">取消</button>
+                    </div>
+                    <canvas id="photoCanvas" class="hidden"></canvas>
+                </div>
+            </div>
+            <button type="submit" id="submitBtn">提交申请</button>
+            <div id="message" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const evidenceFile = document.getElementById('evidenceFile');
+        const previewContainer = document.getElementById('previewContainer');
+        const toggleCameraBtn = document.getElementById('toggleCameraBtn');
+        const cameraPreview = document.getElementById('cameraPreview');
+        const cameraControls = document.getElementById('cameraControls');
+        const captureBtn = document.getElementById('captureBtn');
+        const cancelCameraBtn = document.getElementById('cancelCameraBtn');
+        const photoCanvas = document.getElementById('photoCanvas');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        
+        let stream = null;
+        let evidenceBlob = null;
+        
+        // 文件上传区域点击事件
+        uploadArea.addEventListener('click', () => {
+            evidenceFile.click();
+        });
+        
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        // 文件选择变化
+        evidenceFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        // 处理文件
+        function handleFile(file) {
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showMessage('请选择图片文件', 'error');
+                return;
+            }
+            
+            // 检查文件大小（5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('文件大小不能超过5MB', 'error');
+                return;
+            }
+            
+            // 创建预览
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="预览">
+                    <button type="button" class="remove">&times;</button>
+                `;
+                
+                // 移除预览
+                previewItem.querySelector('.remove').addEventListener('click', () => {
+                    previewContainer.removeChild(previewItem);
+                    evidenceFile.value = '';
+                    evidenceBlob = null;
+                });
+                
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(previewItem);
+                
+                // 存储文件Blob
+                evidenceBlob = file;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 切换摄像头
+        toggleCameraBtn.addEventListener('click', async () => {
+            if (stream) {
+                // 已经打开摄像头，关闭它
+                stopCamera();
+            } else {
+                // 打开摄像头
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' } 
+                    });
+                    cameraPreview.srcObject = stream;
+                    cameraPreview.classList.remove('hidden');
+                    cameraControls.classList.remove('hidden');
+                    toggleCameraBtn.textContent = '关闭摄像头';
+                    toggleCameraBtn.disabled = true;
+                } catch (error) {
+                    console.error('摄像头访问错误:', error);
+                    showMessage('无法访问摄像头: ' + error.message, 'error');
+                }
+            }
+        });
+        
+        // 拍照
+        captureBtn.addEventListener('click', () => {
+            const context = photoCanvas.getContext('2d');
+            photoCanvas.width = cameraPreview.videoWidth;
+            photoCanvas.height = cameraPreview.videoHeight;
+            context.drawImage(cameraPreview, 0, 0);
+            
+            // 将canvas转换为Blob
+            photoCanvas.toBlob((blob) => {
+                // 创建预览
+                const url = URL.createObjectURL(blob);
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${url}" alt="拍照预览">
+                    <button type="button" class="remove">&times;</button>
+                `;
+                
+                // 移除预览
+                previewItem.querySelector('.remove').addEventListener('click', () => {
+                    previewContainer.removeChild(previewItem);
+                    evidenceBlob = null;
+                    URL.revokeObjectURL(url);
+                });
+                
+                previewContainer.innerHTML = '';
+                previewContainer.appendChild(previewItem);
+                
+                // 存储文件Blob
+                evidenceBlob = blob;
+                
+                // 关闭摄像头
+                stopCamera();
+            }, 'image/jpeg', 0.8);
+        });
+        
+        // 取消拍照
+        cancelCameraBtn.addEventListener('click', () => {
+            stopCamera();
+        });
+        
+        // 停止摄像头
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            cameraPreview.srcObject = null;
+            cameraPreview.classList.add('hidden');
+            cameraControls.classList.add('hidden');
+            toggleCameraBtn.textContent = '打开摄像头拍照';
+            toggleCameraBtn.disabled = false;
+        }
+        
+        // 提交表单
+        document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value;
+            const studentId = document.getElementById('studentId').value;
+            const subject = document.getElementById('subject').value;
+            
+            // 禁用提交按钮
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('studentName', studentName);
+                formData.append('studentId', studentId);
+                formData.append('subject', subject);
+                
+                if (evidenceBlob) {
+                    formData.append('evidence', evidenceBlob, 'evidence.jpg');
+                }
+                
+                const response = await fetch('/api/application/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('申请提交成功！', 'success');
+                    document.getElementById('applicationForm').reset();
+                    previewContainer.innerHTML = '';
+                    evidenceBlob = null;
+                } else {
+                    showMessage('提交失败: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('提交错误:', error);
+                showMessage('提交失败，请重试', 'error');
+            } finally {
+                // 恢复提交按钮
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交申请';
+            }
+        });
+        
+        // 显示消息
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = type;
+        }
+        
+        // 页面卸载时关闭摄像头
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stopCamera();
+            }
+        });
+    </script>
+</body>
+</html>
