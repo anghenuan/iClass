@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3498db" />
+      <stop offset="100%" stop-color="#2ecc71" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 图标部分 -->
+  <g transform="translate(0, 5)">
+    <!-- 书本基础 -->
+    <path d="M10,10 C10,10 10,40 10,40 C10,40 40,40 40,40 C40,40 40,10 40,10 C40,10 25,15 25,15 C25,15 10,10 10,10 Z" 
+          fill="#3498db" stroke="#2c3e50" stroke-width="1"/>
+    
+    <!-- 书本中间的线 -->
+    <path d="M25,15 L25,40" stroke="#2c3e50" stroke-width="1.5"/>
+    
+    <!-- 字母E -->
+    <path d="M18,22 L32,22 M18,28 L30,28 M18,34 L32,34" 
+          stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- 问号 -->
+    <circle cx="18" cy="20" r="1.2" fill="#ffffff"/>
+    <circle cx="30" cy="20" r="1.2" fill="#ffffff"/>
+  </g>
+  
+  <!-- 文字部分 -->
+  <g transform="translate(55, 0)">
+    <!-- 主标题 -->
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2c3e50">
+      英语题库
+    </text>
+    
+    <!-- 副标题 -->
+    <text x="0" y="50" font-family="Arial, sans-serif" font-size="14" fill="#7f8c8d">
+      English Question Bank
+    </text>
+  </g>
+</svg>
