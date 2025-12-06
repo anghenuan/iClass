@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员面板 - 班级操行分系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.5rem;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        nav {
+            background-color: #2c3e50;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        nav li {
+            flex: 1;
+        }
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        nav a:hover, nav a.active {
+            background-color: #34495e;
+            border-bottom-color: #667eea;
+        }
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .record-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .record-item.add {
+            border-left: 4px solid #27ae60;
+        }
+        .record-item.deduct {
+            border-left: 4px solid #e74c3c;
+        }
+        .record-type {
+            font-weight: bold;
+            width: 80px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .record-type.add {
+            background-color: #d5f4e6;
+            color: #27ae60;
+        }
+        .record-type.deduct {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        .record-score {
+            font-weight: bold;
+            width: 60px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .record-reason {
+            flex: 1;
+            margin: 0 1rem;
+        }
+        .record-time {
+            color: #666;
+            font-size: 0.9rem;
+            width: 180px;
+            text-align: right;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .logout-btn {
+            background: #e74c3c;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin: 0 0.25rem;
+        }
+        .action-btn.adjust {
+            background: #3498db;
+        }
+        .action-btn.delete {
+            background: #e74c3c;
+        }
+        .action-btn.reset {
+            background: #e67e22;
+        }
+        .action-btn.reset:hover {
+            background: #d35400;
+        }
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .close:hover {
+            color: #333;
+        }
+        
+        /* 系统管理页面样式 */
+        .system-info, .system-actions, .system-notice {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-item label {
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .status-ok {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .status-error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .system-actions {
+            text-align: center;
+        }
+        
+        .system-actions button {
+            margin: 0.5rem;
+        }
+        
+        .system-notice ul {
+            padding-left: 1.5rem;
+        }
+        
+        .system-notice li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        
+        .system-actions .reset {
+            background: #e74c3c;
+        }
+        
+        .system-actions .reset:hover {
+            background: #c0392b;
+        }
+        
+        .system-actions .weekly-reset {
+            background: #e67e22;
+        }
+        
+        .system-actions .weekly-reset:hover {
+            background: #d35400;
+        }
+        /* 在现有CSS中添加以下样式 */
+
+.rank-item {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.rank-position {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+  width: 50px;
+  text-align: center;
+}
+
+.rank-class {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.rank-score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.rank-students {
+  margin-top: 1rem;
+}
+
+.student-rank-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.student-rank-item:last-child {
+  border-bottom: none;
+}
+
+.student-name {
+  flex: 1;
+}
+
+.student-score {
+  font-weight: bold;
+  color: #333;
+}
+
+.top-rank {
+  border-left: 4px solid #FFD700;
+}
+
+.second-rank {
+  border-left: 4px solid #C0C0C0;
+}
+
+.third-rank {
+  border-left: 4px solid #CD7F32;
+}
+
+.rank-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.rank-1 {
+  background-color: #FFD700;
+  color: #333;
+}
+
+.rank-2 {
+  background-color: #C0C0C0;
+  color: #333;
+}
+
+.rank-3 {
+  background-color: #CD7F32;
+  color: white;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>班级操行分系统 - 管理员面板</h1>
+        <div class="user-info">
+            <span>管理员</span>
+            <button id="logoutBtn" class="logout-btn">退出登录</button>
+        </div>
+    </header>
+
+    <!-- 在导航栏中添加排名页面 -->
+<nav>
+  <ul>
+    <li><a href="#" class="nav-link active" data-page="students">学生管理</a></li>
+    <li><a href="#" class="nav-link" data-page="applications">申请管理</a></li>
+    <li><a href="#" class="nav-link" data-page="ranks">小组排名</a></li>
+    <li><a href="#" class="nav-link" data-page="system">系统管理</a></li>
+  </ul>
+</nav>
+
+<!-- 添加小组排名页面 -->
+<div id="ranks-page" class="page">
+  <h2 class="section-title">小组排名</h2>
+  <div id="classRanksContainer">
+    <div class="empty-state">加载中...</div>
+  </div>
+</div>
+    
+    <main>
+        <!-- 学生管理页面 -->
+        <div id="students-page" class="page active">
+            <h2 class="section-title">学生分数管理</h2>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>组别</th>
+                        <th>当前分数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- 动态填充 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 申请管理页面 -->
+        <div id="applications-page" class="page">
+            <h2 class="section-title">未审核申请管理</h2>
+            <div id="pendingApplications">
+                <div class="empty-state">暂无待审核申请</div>
+            </div>
+        </div>
+        
+        <!-- 系统管理页面 -->
+        <div id="system-page" class="page">
+            <h2 class="section-title">系统管理</h2>
+            
+            <div class="system-info">
+                <h3>系统状态</h3>
+                <div class="info-item">
+                    <label>当前周数:</label>
+                    <span id="currentWeek">-</span>
+                </div>
+                <div class="info-item">
+                    <label>上次重置周数:</label>
+                    <span id="lastResetWeek">-</span>
+                </div>
+                <div class="info-item">
+                    <label>状态:</label>
+                    <span id="resetStatus" class="status-pending">检查中...</span>
+                </div>
+            </div>
+            
+            <div class="system-actions">
+                <h3>系统操作</h3>
+                <button id="manualResetBtn" class="action-btn reset">手动重置所有学生分数</button>
+                <button id="forceWeeklyResetBtn" class="action-btn weekly-reset">执行每周自动重置</button>
+            </div>
+            
+            <div class="system-notice">
+                <h3>说明</h3>
+                <ul>
+                    <li>系统会在每周一自动重置所有学生分数为100分，并清空所有记录</li>
+                    <li>手动重置功能可以随时将所有学生分数重置为100分</li>
+                    <li>执行每周自动重置会模拟系统自动重置流程</li>
+                    <li>每周重置后，所有学生的分数将恢复为100分，所有记录将被清空</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- 调整分数模态框 -->
+    <div id="adjustModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalStudentName">调整学生分数</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="adjustForm">
+                <input type="hidden" id="adjustStudentId" name="studentId">
+                <div class="form-group">
+                    <label for="adjustScore">新分数</label>
+                    <input type="number" id="adjustScore" name="newScore" min="0" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit">确认调整</button>
+                    <button type="button" class="close-modal">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 检查管理员登录状态
+        const token = localStorage.getItem('adminToken');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        
+        // 页面导航
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.add('active');
+                
+                // 加载对应页面数据
+                if (this.getAttribute('data-page') === 'students') {
+                    loadStudentsData();
+                } else if (this.getAttribute('data-page') === 'applications') {
+                    loadPendingApplications();
+                } else if (this.getAttribute('data-page') === 'system') {
+                    loadSystemStatus();
+                }
+            });
+        });
+        
+        // 加载学生数据
+        function loadStudentsData() {
+            fetch('/api/admin/students', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const tbody = document.getElementById('studentsTableBody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">暂无学生数据</td></tr>';
+                        return;
+                    }
+                    
+                    data.data.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student.id}</td>
+                            <td>${student.name}</td>
+                            <td>${student.class}</td>
+                            <td>${student.currentScore}</td>
+                            <td>
+                                <button class="action-btn adjust" data-id="${student.id}" data-name="${student.name}" data-score="${student.currentScore}">调整分数</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // 添加调整分数事件
+                    document.querySelectorAll('.adjust').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const studentId = this.getAttribute('data-id');
+                            const studentName = this.getAttribute('data-name');
+                            const currentScore = this.getAttribute('data-score');
+                            
+                            document.getElementById('modalStudentName').textContent = `调整 ${studentName} 的分数`;
+                            document.getElementById('adjustStudentId').value = studentId;
+                            document.getElementById('adjustScore').value = currentScore;
+                            
+                            document.getElementById('adjustModal').style.display = 'flex';
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('加载学生数据错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 提交分数调整
+        document.getElementById('adjustForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('adjustStudentId').value;
+            const newScore = document.getElementById('adjustScore').value;
+            
+            fetch('/api/admin/adjust-score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ studentId, newScore })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('分数调整成功');
+                    document.getElementById('adjustModal').style.display = 'none';
+                    loadStudentsData();
+                } else {
+                    alert('分数调整失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('分数调整错误:', error);
+                alert('分数调整失败，请重试');
+            });
+        });
+        
+        // 加载待审核申请
+        function loadPendingApplications() {
+            fetch('/api/admin/pending-applications', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('pendingApplications');
+                    
+                    if (data.data.length === 0) {
+                        container.innerHTML = '<div class="empty-state">暂无待审核申请</div>';
+                        return;
+                    }
+                    
+                    const applicationsHtml = data.data.map(application => `
+                        <div class="record-item ${application.type}">
+                            <span class="record-type ${application.type}">${application.type === 'add' ? '加分' : '扣分'}申请</span>
+                            <span class="record-score">${application.type === 'add' ? '+' : '-'}${application.score}</span>
+                            <span class="record-reason">${application.reason}</span>
+                            <span class="record-time">${new Date(application.timestamp).toLocaleString()}</span>
+                            <span>${application.studentName} - ${application.subject}</span>
+                            <div class="btn-group">
+                                <button class="action-btn delete" data-id="${application.id}">删除</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    container.innerHTML = applicationsHtml;
+                    
+                    // 添加删除事件
+                    document.querySelectorAll('.delete').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const applicationId = this.getAttribute('data-id');
+                            if (confirm('确定要删除此申请吗？')) {
+                                deleteApplication(applicationId);
+                            }
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('加载待审核申请错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 删除申请
+        function deleteApplication(applicationId) {
+            fetch(`/api/admin/application/${applicationId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('申请删除成功');
+                    loadPendingApplications();
+                } else {
+                    alert('申请删除失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('删除申请错误:', error);
+                alert('申请删除失败，请重试');
+            });
+        }
+        
+        // 加载系统状态
+        function loadSystemStatus() {
+            fetch('/api/admin/system-status', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('currentWeek').textContent = data.data.currentWeek;
+                    document.getElementById('lastResetWeek').textContent = data.data.lastResetWeek;
+                    
+                    const statusElement = document.getElementById('resetStatus');
+                    if (data.data.needReset) {
+                        statusElement.textContent = '需要重置';
+                        statusElement.className = 'status-error';
+                    } else {
+                        statusElement.textContent = '正常';
+                        statusElement.className = 'status-ok';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('加载系统状态错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 手动重置分数
+        document.getElementById('manualResetBtn').addEventListener('click', function() {
+            if (confirm('确定要手动重置所有学生分数吗？此操作不可撤销！所有学生分数将重置为100分，所有记录将被清空。')) {
+                fetch('/api/admin/reset-scores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ resetType: 'manual' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadSystemStatus();
+                        // 重新加载学生数据以显示重置后的分数
+                        loadStudentsData();
+                    } else {
+                        alert('重置失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('重置错误:', error);
+                    alert('重置失败，请重试');
+                });
+            }
+        });
+        
+        // 执行每周自动重置
+        document.getElementById('forceWeeklyResetBtn').addEventListener('click', function() {
+            if (confirm('确定要执行每周自动重置吗？此操作将重置所有学生分数为100分，并清空所有记录！')) {
+                fetch('/api/admin/reset-scores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ resetType: 'weekly' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadSystemStatus();
+                        // 重新加载学生数据以显示重置后的分数
+                        loadStudentsData();
+                    } else {
+                        alert('重置失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('重置错误:', error);
+                    alert('重置失败，请重试');
+                });
+            }
+        });
+        
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
+        });
+        
+        // 关闭模态框
+        document.querySelectorAll('.close, .close-modal').forEach(closeBtn => {
+            closeBtn.addEventListener('click', function() {
+                document.getElementById('adjustModal').style.display = 'none';
+            });
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+        
+        // 在管理员端JavaScript中添加以下功能
+
+// 页面导航中添加排名页面
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 移除所有活动状态
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    
+    // 添加当前活动状态
+    this.classList.add('active');
+    const pageId = this.getAttribute('data-page') + '-page';
+    document.getElementById(pageId).classList.add('active');
+    
+    // 加载对应页面数据
+    if (this.getAttribute('data-page') === 'students') {
+      loadStudentsData();
+    } else if (this.getAttribute('data-page') === 'applications') {
+      loadPendingApplications();
+    } else if (this.getAttribute('data-page') === 'ranks') {
+      loadClassRanks();
+    } else if (this.getAttribute('data-page') === 'system') {
+      loadSystemStatus();
+    }
+  });
+});
+
+// 加载小组排名
+function loadClassRanks() {
+  fetch('/api/admin/class-ranks', {
+    headers: {
+      'Authorization': token
+    }
+  })
+  .then(response => {
+    if (response.status === 401) {
+      throw new Error('认证失效');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      const container = document.getElementById('classRanksContainer');
+      
+      if (data.data.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无小组数据</div>';
+        return;
+      }
+      
+      const ranksHtml = data.data.map(classRank => {
+        let rankClass = '';
+        if (classRank.rank === 1) rankClass = 'top-rank';
+        else if (classRank.rank === 2) rankClass = 'second-rank';
+        else if (classRank.rank === 3) rankClass = 'third-rank';
+        
+        const studentsHtml = classRank.students.map((student, index) => `
+          <div class="student-rank-item">
+            <span class="student-name">${index + 1}. ${student.name}</span>
+            <span class="student-score">${student.score}分</span>
+          </div>
+        `).join('');
+        
+        return `
+          <div class="rank-item ${rankClass}">
+            <div class="rank-header">
+              <div class="rank-position">
+                <span class="rank-badge rank-${classRank.rank}">第${classRank.rank}名</span>
+              </div>
+              <div class="rank-class">${classRank.className}</div>
+              <div class="rank-score">平均分: ${classRank.averageScore}</div>
+            </div>
+            <div class="rank-students">
+              ${studentsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = ranksHtml;
+    }
+  })
+  .catch(error => {
+    console.error('加载小组排名错误:', error);
+    if (error.message === '认证失效') {
+      localStorage.removeItem('adminToken');
+      window.location.href = 'login.html';
+    }
+  });
+}
+
+        // 初始加载学生数据
+        loadStudentsData();
+    </script>
+</body>
+</html>
