@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || '英语题库' %></title>
+    
+    <!-- 网站图标 -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- 样式表 -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- 预加载图标 -->
+    <link rel="preload" href="/icons.svg" as="image" type="image/svg+xml">
+    
+    <style>
+        /* 自定义图标样式 */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+            vertical-align: -0.125em;
+        }
+        
+        .icon-sm {
+            width: 0.875em;
+            height: 0.875em;
+        }
+        
+        .icon-lg {
+            width: 1.5em;
+            height: 1.5em;
+        }
+        
+        .icon-xl {
+            width: 2em;
+            height: 2em;
+        }
+        
+        /* 颜色变量 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        .icon-primary { color: var(--primary-color); }
+        .icon-secondary { color: var(--secondary-color); }
+        .icon-success { color: var(--success-color); }
+        .icon-danger { color: var(--danger-color); }
+        .icon-warning { color: var(--warning-color); }
+        .icon-light { color: var(--light-color); }
+        .icon-dark { color: var(--dark-color); }
+    </style>
+</head>
+<body>
+    <!-- 隐藏的SVG图标精灵，用于引用 -->
+    <svg style="display: none;">
+      <symbol id="logo-icon" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3498db" />
+            <stop offset="100%" stop-color="#2c3e50" />
+          </linearGradient>
+        </defs>
+        
+        <circle cx="32" cy="32" r="30" fill="url(#logoGradient)" stroke="#ecf0f1" stroke-width="2"/>
+        
+        <path d="M20,18 C20,18 20,46 20,46 C20,46 44,46 44,46 C44,46 44,18 44,18 C44,18 32,22 32,22 C32,22 20,18 20,18 Z" 
+              fill="url(#gradient)" stroke="#ecf0f1" stroke-width="1"/>
+        
+        <path d="M32,22 L32,46" stroke="#ecf0f1" stroke-width="1.5"/>
+        
+        <path d="M28,30 L38,30 M28,34 L36,34 M28,38 L38,38" 
+              stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        
+        <circle cx="28" cy="28" r="1.5" fill="#ffffff"/>
+        <circle cx="36" cy="28" r="1.5" fill="#ffffff"/>
+      </symbol>
+    </svg>
+    
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">
+                <!-- 使用SVG图标作为Logo -->
+                <svg class="icon icon-lg" style="margin-right: 8px;">
+                    <use xlink:href="#logo-icon"></use>
+                </svg>
+                <span style="font-weight: bold; color: white;">英语题库</span>
+            </a>
+            <ul class="nav-links">
+                <% if (user) { %>
+                    <li>
+                        <a href="/profile">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-user"></use>
+                            </svg>
+                            个人主页
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/problems">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-list"></use>
+                            </svg>
+                            题目列表
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/create-problem">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-create"></use>
+                            </svg>
+                            发布题目
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ranking">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-ranking"></use>
+                            </svg>
+                            排名
+                        </a>
+                    </li>
+                    <% if (isAdmin) { %>
+                        <li>
+                            <a href="/admin">
+                                <svg class="icon" style="margin-right: 6px;">
+                                    <use xlink:href="/icons.svg#icon-admin"></use>
+                                </svg>
+                                管理
+                            </a>
+                        </li>
+                    <% } %>
+                    <li>
+                        <a href="/logout">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-logout"></use>
+                            </svg>
+                            退出
+                        </a>
+                    </li>
+                <% } else { %>
+                    <li>
+                        <a href="/login">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-login"></use>
+                            </svg>
+                            登录
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/register">
+                            <svg class="icon" style="margin-right: 6px;">
+                                <use xlink:href="/icons.svg#icon-register"></use>
+                            </svg>
+                            注册
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container main-content">
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <svg class="icon icon-success" style="margin-right: 8px;">
+                    <use xlink:href="/icons.svg#icon-check"></use>
+                </svg>
+                <%= success %>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <svg class="icon icon-danger" style="margin-right: 8px;">
+                    <use xlink:href="/icons.svg#icon-wrong"></use>
+                </svg>
+                <%= error %>
+            </div>
+        <% } %>
