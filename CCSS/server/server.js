@@ -93,6 +93,7 @@ app.get('/', (req, res) => {
           <li><a href="/teacher/login.html">教师端</a></li>
           <li><a href="/admin/login.html">管理员</a></li>
           <li><a href="/application/submit.html">提交申请</a></li>
+          <li><a href="/FAQ">常见问题解答</a></li>
         </ul>
       </body>
     </html>
@@ -123,4 +124,5 @@ app.listen(PORT, () => {
   console.log(`教师端: http://localhost:${PORT}/teacher/login.html`);
   console.log(`管理员: http://localhost:${PORT}/admin/login.html`);
   console.log(`申请页面: http://localhost:${PORT}/application/submit.html`);
+  console.log(`常见问题解答: http://localhost:${PORT}/FAQ`);
 });
