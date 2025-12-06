@@ -1,0 +1,62 @@
+<%- include('partials/header', { title: '答题结果 - 英语题库' }) %>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">答题结果</h2>
+    
+    <div style="text-align: center; margin-bottom: 2rem; padding: 2rem; background-color: #f8f9fa; border-radius: 8px;">
+        <h1 style="font-size: 3rem; color: #2c3e50; margin-bottom: 1rem;"><%= score %>%</h1>
+        <p style="font-size: 1.2rem;">
+            正确: <strong style="color: #27ae60;"><%= correctCount %></strong> / 
+            总数: <strong><%= totalQuestions %></strong>
+        </p>
+        <p style="margin-top: 1rem;">
+            <% if (score >= 80) { %>
+                <span style="color: #27ae60;">优秀！继续保持！</span>
+            <% } else if (score >= 60) { %>
+                <span style="color: #f39c12;">不错，还有提升空间！</span>
+            <% } else { %>
+                <span style="color: #e74c3c;">需要继续努力哦！</span>
+            <% } %>
+        </p>
+    </div>
+    
+    <h3 style="margin-bottom: 1.5rem;">详细结果</h3>
+    
+    <% results.forEach((result, index) => { %>
+        <div class="question-item card" style="margin-bottom: 1.5rem;">
+            <h4>第 <%= index + 1 %> 题: <%= result.question %></h4>
+            
+            <% if (result.isCorrect) { %>
+                <div class="result-correct">
+                    <i class="fas fa-check-circle"></i> 正确！
+                </div>
+            <% } else { %>
+                <div class="result-incorrect">
+                    <i class="fas fa-times-circle"></i> 错误
+                </div>
+            <% } %>
+            
+            <div style="margin-top: 1rem;">
+                <p><strong>你的答案:</strong> <%= result.userAnswer || '未作答' %></p>
+                <p><strong>正确答案:</strong> <%= result.correctAnswer %></p>
+            </div>
+            
+            <% if (result.explanation) { %>
+                <div class="result-explanation">
+                    <p><strong>解析:</strong> <%= result.explanation %></p>
+                </div>
+            <% } %>
+        </div>
+    <% }) %>
+    
+    <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
+        <a href="/problems" class="btn btn-primary" style="margin-right: 1rem;">
+            <i class="fas fa-list"></i> 继续答题
+        </a>
+        <a href="/problem/<%= problem.id %>" class="btn">
+            <i class="fas fa-redo"></i> 重新尝试
+        </a>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

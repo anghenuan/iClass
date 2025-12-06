@@ -1,0 +1,27 @@
+<%- include('partials/header', { title: '登录 - 英语题库' }) %>
+
+<div class="card" style="max-width: 400px; margin: 2rem auto;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">登录</h2>
+    
+    <form action="/login" method="POST">
+        <div class="form-group">
+            <label class="form-label">用户名</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">密码</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+        <p>还没有账号？ <a href="/register">立即注册</a></p>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

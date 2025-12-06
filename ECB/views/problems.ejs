@@ -1,0 +1,39 @@
+<%- include('partials/header', { title: '题目列表 - 英语题库' }) %>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">题目列表</h2>
+    
+    <% if (problems.length === 0) { %>
+        <p style="text-align: center; color: #7f8c8d; padding: 2rem;">暂无题目</p>
+        <% if (user) { %>
+            <div style="text-align: center;">
+                <a href="/create-problem" class="btn btn-primary">发布第一个题目</a>
+            </div>
+        <% } %>
+    <% } else { %>
+        <div class="problems-grid">
+            <% problems.forEach(problem => { %>
+                <div class="problem-card card">
+                    <h3 class="problem-title">
+                        <a href="/problem/<%= problem.id %>" style="color: inherit; text-decoration: none;">
+                            <%= problem.title %>
+                        </a>
+                    </h3>
+                    
+                    <div class="problem-meta">
+                        <p><i class="fas fa-user"></i> <%= problem.username %></p>
+                        <p><i class="fas fa-question-circle"></i> <%= problem.questionCount %> 个问题</p>
+                        <p><i class="fas fa-calendar"></i> <%= new Date(problem.created_at).toLocaleDateString() %></p>
+                        <p><i class="fas fa-chart-bar"></i> <%= problem.attempts || 0 %> 次答题</p>
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <a href="/problem/<%= problem.id %>" class="btn btn-primary" style="width: 100%;">开始答题</a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

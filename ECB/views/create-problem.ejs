@@ -1,0 +1,140 @@
+<%- include('partials/header', { title: '发布题目 - 英语题库' }) %>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">发布新题目</h2>
+    
+    <form action="/create-problem" method="POST" enctype="multipart/form-data">
+        <!-- 题目基本信息 -->
+        <div class="form-group">
+            <label class="form-label">题目名称 *</label>
+            <input type="text" name="title" class="form-control" required placeholder="请输入题目名称">
+        </div>
+        
+        <!-- Markdown内容 -->
+        <div class="form-group">
+            <label class="form-label">题目内容 (Markdown格式) *</label>
+            <div style="margin-bottom: 1rem;">
+                <button type="button" id="toggleMarkdownBtn" class="btn btn-sm" onclick="toggleMarkdownInput()">切换到文件上传</button>
+            </div>
+            
+            <div id="markdownTextInput">
+                <textarea name="markdownText" id="markdownText" class="form-control" rows="10" placeholder="在此粘贴Markdown内容..."></textarea>
+            </div>
+            
+            <div id="markdownFileInput" style="display: none;">
+                <input type="file" name="markdownFile" class="form-control" accept=".md,.txt,.markdown" onchange="previewMarkdownFile(this)">
+                <small style="color: #7f8c8d;">支持 .md, .txt, .markdown 格式，文件大小不超过10MB</small>
+            </div>
+        </div>
+        
+        <!-- 图片上传 -->
+        <div class="form-group">
+            <label class="form-label">上传图片 (可选)</label>
+            <div id="imageUploads">
+                <div class="image-upload-item" style="margin-bottom: 1rem;">
+                    <div class="row">
+                        <div style="flex: 1;">
+                            <input type="file" name="images" class="form-control" accept="image/*">
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="text" name="imageNames" class="form-control" placeholder="图片名称">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeImageUpload(this)">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="addImageUpload()">
+                <i class="fas fa-plus"></i> 添加更多图片
+            </button>
+            <small style="color: #7f8c8d;">可以上传多张图片，每张图片需要指定图片名</small>
+        </div>
+        
+        <!-- 题目数量 -->
+        <div class="form-group">
+            <label class="form-label">题目数量 *</label>
+            <select name="questionCount" class="form-control" onchange="updateQuestionCount()" required>
+                <% for (let i = 1; i <= 10; i++) { %>
+                    <option value="<%= i %>" <%= i === 1 ? 'selected' : '' %>><%= i %>题</option>
+                <% } %>
+            </select>
+        </div>
+        
+        <!-- 题目列表 -->
+        <div id="questions-container">
+            <!-- 第一个题目 -->
+            <div class="question-item card">
+                <h4>题目 1</h4>
+                <div class="form-group">
+                    <label class="form-label">题目类型 *</label>
+                    <select name="type_0" class="form-control question-type" onchange="updateQuestionType(0)" required>
+                        <option value="choice">选择题</option>
+                        <option value="fill">填空题</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">题目描述 *</label>
+                    <textarea name="question_0" class="form-control" rows="2" placeholder="请输入题目描述..." required></textarea>
+                </div>
+                
+                <div class="form-group" id="options_0">
+                    <label class="form-label">选项数量 *</label>
+                    <select name="optionCount_0" class="form-control option-count" onchange="updateOptions(0)" required>
+                        <% for (let i = 2; i <= 6; i++) { %>
+                            <option value="<%= i %>" <%= i === 4 ? 'selected' : '' %>><%= i %>个选项</option>
+                        <% } %>
+                    </select>
+                    <div class="options-list mt-2" id="optionsList_0">
+                        <!-- 选项通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">正确答案 *</label>
+                    <input type="text" name="correctAnswer_0" class="form-control" placeholder="请输入正确答案（如A、B、C或具体答案）" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">题目解析 (可选)</label>
+                    <textarea name="explanation_0" class="form-control" rows="2" placeholder="请输入题目解析..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 添加题目按钮 -->
+        <div class="form-group" style="text-align: center; margin-bottom: 2rem;">
+            <button type="button" class="btn btn-primary" onclick="addQuestion()">
+                <i class="fas fa-plus"></i> 添加更多题目
+            </button>
+        </div>
+        
+        <!-- 是否有解析 -->
+        <div class="form-group">
+            <label class="form-label">题目是否包含解析？</label>
+            <div>
+                <label style="margin-right: 1rem;">
+                    <input type="radio" name="hasExplanation" value="true" checked> 是
+                </label>
+                <label>
+                    <input type="radio" name="hasExplanation" value="false"> 否
+                </label>
+            </div>
+        </div>
+        
+        <!-- 提交按钮 -->
+        <div class="form-group" style="text-align: center;">
+            <button type="submit" class="btn btn-success" style="padding: 0.75rem 3rem; font-size: 1.1rem;">
+                <i class="fas fa-save"></i> 发布题目
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 初始化第一个题目的选项
+    updateOptions(0);
+</script>
+
+<%- include('partials/footer') %>

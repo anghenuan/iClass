@@ -1,0 +1,65 @@
+<%- include('partials/header', { title: '首页 - 英语题库' }) %>
+
+<div class="hero-section" style="text-align: center; padding: 4rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; margin-bottom: 2rem;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem;">英语题库系统</h1>
+    <p style="font-size: 1.2rem; margin-bottom: 2rem;">分享、学习、提升英语能力</p>
+    <% if (!user) { %>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/register" class="btn" style="background-color: white; color: #667eea;">立即注册</a>
+            <a href="/login" class="btn" style="background-color: transparent; border: 2px solid white;">登录</a>
+        </div>
+    <% } else { %>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/create-problem" class="btn" style="background-color: white; color: #667eea;">发布题目</a>
+            <a href="/problems" class="btn" style="background-color: transparent; border: 2px solid white;">开始答题</a>
+        </div>
+    <% } %>
+</div>
+
+<div class="features" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+    <div class="feature-card card">
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <i class="fas fa-share-alt" style="font-size: 3rem; color: #3498db;"></i>
+        </div>
+        <h3 style="text-align: center; margin-bottom: 1rem;">分享题目</h3>
+        <p style="text-align: center;">上传Markdown文档或直接输入，创建英语题目供他人练习</p>
+    </div>
+    
+    <div class="feature-card card">
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <i class="fas fa-graduation-cap" style="font-size: 3rem; color: #2ecc71;"></i>
+        </div>
+        <h3 style="text-align: center; margin-bottom: 1rem;">学习提升</h3>
+        <p style="text-align: center;">练习他人分享的题目，查看解析，持续提升英语水平</p>
+    </div>
+    
+    <div class="feature-card card">
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <i class="fas fa-chart-line" style="font-size: 3rem; color: #f39c12;"></i>
+        </div>
+        <h3 style="text-align: center; margin-bottom: 1rem;">数据追踪</h3>
+        <p style="text-align: center;">记录答题数据，查看排名，了解自己的学习进度</p>
+    </div>
+</div>
+
+<% if (user) { %>
+    <div class="quick-actions card">
+        <h2 style="margin-bottom: 1.5rem;">快速开始</h2>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="/create-problem" class="btn btn-primary">
+                <i class="fas fa-plus"></i> 发布新题目
+            </a>
+            <a href="/problems" class="btn btn-success">
+                <i class="fas fa-play"></i> 开始答题
+            </a>
+            <a href="/ranking" class="btn btn-warning">
+                <i class="fas fa-trophy"></i> 查看排名
+            </a>
+            <a href="/profile" class="btn">
+                <i class="fas fa-user"></i> 个人中心
+            </a>
+        </div>
+    </div>
+<% } %>
+
+<%- include('partials/footer') %>
