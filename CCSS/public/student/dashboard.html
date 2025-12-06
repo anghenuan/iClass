@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生仪表板 - 班级操行分系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.5rem;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        nav {
+            background-color: #2c3e50;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        nav li {
+            flex: 1;
+        }
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            text-align: center;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        nav a:hover, nav a.active {
+            background-color: #34495e;
+            border-bottom-color: #667eea;
+        }
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .score-display {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .score-display span {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .record-item {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .record-item.add {
+            border-left: 4px solid #27ae60;
+        }
+        .record-item.deduct {
+            border-left: 4px solid #e74c3c;
+        }
+        .record-type {
+            font-weight: bold;
+            width: 80px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .record-type.add {
+            background-color: #d5f4e6;
+            color: #27ae60;
+        }
+        .record-type.deduct {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        .record-score {
+            font-weight: bold;
+            width: 60px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .record-reason {
+            flex: 1;
+            margin: 0 1rem;
+        }
+        .record-time {
+            color: #666;
+            font-size: 0.9rem;
+            width: 180px;
+            text-align: right;
+        }
+        .record-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+        .record-status.pending {
+            background-color: #f39c12;
+            color: white;
+        }
+        .record-status.approved {
+            background-color: #27ae60;
+            color: white;
+        }
+        .record-status.rejected {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .logout-btn {
+            background: #e74c3c;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* 在现有CSS中添加以下样式 */
+
+.rank-item {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.rank-position {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+  width: 50px;
+  text-align: center;
+}
+
+.rank-class {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.rank-score {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.rank-students {
+  margin-top: 1rem;
+}
+
+.student-rank-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.student-rank-item:last-child {
+  border-bottom: none;
+}
+
+.student-name {
+  flex: 1;
+}
+
+.student-score {
+  font-weight: bold;
+  color: #333;
+}
+
+.top-rank {
+  border-left: 4px solid #FFD700;
+}
+
+.second-rank {
+  border-left: 4px solid #C0C0C0;
+}
+
+.third-rank {
+  border-left: 4px solid #CD7F32;
+}
+
+.rank-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.rank-1 {
+  background-color: #FFD700;
+  color: #333;
+}
+
+.rank-2 {
+  background-color: #C0C0C0;
+  color: #333;
+}
+
+.rank-3 {
+  background-color: #CD7F32;
+  color: white;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>班级操行分系统 - 学生端</h1>
+        <div class="user-info">
+            <span id="studentName"></span>
+            <button id="logoutBtn" class="logout-btn">退出登录</button>
+        </div>
+    </header>
+    
+    <nav>
+      <ul>
+        <li><a href="#" class="nav-link active" data-page="score">我的分数</a></li>
+        <li><a href="#" class="nav-link" data-page="records">记录查询</a></li>
+        <li><a href="#" class="nav-link" data-page="ranks">小组排名</a></li>
+        <li><a href="#" class="nav-link" data-page="application">提交申请</a></li>
+        <li><a href="#" class="nav-link" data-page="appeal">扣分申诉</a></li>
+        <li><a href="#" class="nav-link" data-page="report">举报学生</a></li>
+        <li><a href="#" class="nav-link" data-page="settings">设置</a></li>
+      </ul>
+    </nav>
+
+<!-- 添加小组排名页面 -->
+<div id="ranks-page" class="page">
+  <h2 class="section-title">小组排名</h2>
+  <div id="classRanksContainer">
+    <div class="empty-state">加载中...</div>
+  </div>
+</div>
+    
+    <main>
+        <!-- 分数显示页面 -->
+        <div id="score-page" class="page active">
+            <h2 class="section-title">我的当前分数</h2>
+            <div class="score-display">
+                <span id="currentScore">100</span>
+            </div>
+            <h3 class="section-title">最近记录</h3>
+            <div id="recentRecords">
+                <div class="empty-state">暂无记录</div>
+            </div>
+        </div>
+        
+        <!-- 记录查询页面 -->
+        <div id="records-page" class="page">
+            <h2 class="section-title">加分/扣分记录</h2>
+            <div id="allRecords">
+                <div class="empty-state">暂无记录</div>
+            </div>
+        </div>
+        
+        <!-- 提交申请页面 -->
+        <div id="application-page" class="page">
+            <h2 class="section-title">提交加分/扣分申请</h2>
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label>类型</label>
+                    <select id="applicationType" name="type">
+                        <option value="add">加分</option>
+                        <option value="deduct">扣分</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分数</label>
+                    <input type="number" id="applicationScore" name="score" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>科目</label>
+                    <select id="applicationSubject" name="subject">
+                        <option value="非学科性">非学科性</option>
+                        <option value="语文">语文</option>
+                        <option value="数学">数学</option>
+                        <option value="英语">英语</option>
+                        <option value="物理">物理</option>
+                        <!--<option value="化学">化学</option>-->
+                        <option value="生物">生物</option>
+                        <option value="历史">历史</option>
+                        <option value="地理">地理</option>
+                        <option value="政治">政治</option>
+                        <option value="体育">体育</option>
+                        <option value="信息技术">信息技术</option>
+                        <option value="常规">常规</option>
+                        <option value="学习">学习</option>
+                        <option value="生活">生活</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>原因</label>
+                    <textarea id="applicationReason" name="reason" required placeholder="请详细说明申请原因..."></textarea>
+                </div>
+                <button type="submit">提交申请</button>
+            </form>
+        </div>
+        
+        <!-- 其他页面内容 -->
+        <div id="appeal-page" class="page">
+            <h2 class="section-title">扣分申诉</h2>
+            <div class="empty-state">功能开发中...</div>
+        </div>
+        
+        <div id="report-page" class="page">
+            <h2 class="section-title">举报学生</h2>
+            <div class="empty-state">功能开发中...</div>
+        </div>
+        
+        <div id="settings-page" class="page">
+            <h2 class="section-title">修改密码</h2>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="oldPassword">原密码</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">新密码</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">确认新密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit">修改密码</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // 获取学生信息
+        const studentInfo = JSON.parse(localStorage.getItem('studentInfo'));
+        const token = localStorage.getItem('studentToken');
+        
+        if (!token || !studentInfo) {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('studentName').textContent = studentInfo.name;
+        
+        // 页面导航
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                const pageId = this.getAttribute('data-page') + '-page';
+                document.getElementById(pageId).classList.add('active');
+                
+                // 加载对应页面数据
+                if (this.getAttribute('data-page') === 'score') {
+                    loadScoreData();
+                } else if (this.getAttribute('data-page') === 'records') {
+                    loadAllRecords();
+                }
+            });
+        });
+        
+        // 加载分数数据
+        function loadScoreData() {
+            fetch('/api/student/score', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('currentScore').textContent = data.data.currentScore;
+                    
+                    // 显示最近5条记录
+                    const recentRecords = data.data.records.slice(0, 5);
+                    const recordsContainer = document.getElementById('recentRecords');
+                    
+                    if (recentRecords.length > 0) {
+                        const recordsHtml = recentRecords.map(record => `
+                            <div class="record-item ${record.type}">
+                                <span class="record-type ${record.type}">${record.type === 'add' ? '加分' : '扣分'}</span>
+                                <span class="record-score">${record.type === 'add' ? '+' : '-'}${record.score}</span>
+                                <span class="record-reason">${record.reason}</span>
+                                <span class="record-time">${new Date(record.timestamp).toLocaleString()}</span>
+                            </div>
+                        `).join('');
+                        recordsContainer.innerHTML = recordsHtml;
+                    } else {
+                        recordsContainer.innerHTML = '<div class="empty-state">暂无记录</div>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('加载分数数据错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('studentToken');
+                    localStorage.removeItem('studentInfo');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 加载所有记录
+        function loadAllRecords() {
+            fetch('/api/student/applications', {
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('认证失效');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const recordsContainer = document.getElementById('allRecords');
+                    
+                    if (data.data.length > 0) {
+                        const recordsHtml = data.data.map(record => `
+                            <div class="record-item ${record.type}">
+                                <span class="record-type ${record.type}">${record.type === 'add' ? '加分' : '扣分'}申请</span>
+                                <span class="record-score">${record.type === 'add' ? '+' : '-'}${record.score}</span>
+                                <span class="record-reason">${record.reason}</span>
+                                <span class="record-time">${new Date(record.timestamp).toLocaleString()}</span>
+                                <span class="record-status ${record.status}">${record.status === 'pending' ? '待审核' : record.status === 'approved' ? '已通过' : '已拒绝'}</span>
+                            </div>
+                        `).join('');
+                        recordsContainer.innerHTML = recordsHtml;
+                    } else {
+                        recordsContainer.innerHTML = '<div class="empty-state">暂无申请记录</div>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('加载记录错误:', error);
+                if (error.message === '认证失效') {
+                    localStorage.removeItem('studentToken');
+                    localStorage.removeItem('studentInfo');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // 提交申请
+        document.getElementById('applicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                type: formData.get('type'),
+                score: formData.get('score'),
+                reason: formData.get('reason'),
+                subject: formData.get('subject')
+            };
+            
+            fetch('/api/student/application', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('申请提交成功');
+                    this.reset();
+                } else {
+                    alert('申请提交失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('提交申请错误:', error);
+                alert('申请提交失败，请重试');
+            });
+        });
+        
+        // 修改密码
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('新密码与确认密码不一致');
+                return;
+            }
+            
+            fetch('/api/student/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ oldPassword, newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('密码修改成功');
+                    this.reset();
+                } else {
+                    alert('密码修改失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('修改密码错误:', error);
+                alert('密码修改失败，请重试');
+            });
+        });
+        
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('studentToken');
+            localStorage.removeItem('studentInfo');
+            window.location.href = 'login.html';
+        });
+
+        // 在学生端JavaScript中添加以下功能
+
+// 页面导航中添加排名页面
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 移除所有活动状态
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    
+    // 添加当前活动状态
+    this.classList.add('active');
+    const pageId = this.getAttribute('data-page') + '-page';
+    document.getElementById(pageId).classList.add('active');
+    
+    // 加载对应页面数据
+    if (this.getAttribute('data-page') === 'score') {
+      loadScoreData();
+    } else if (this.getAttribute('data-page') === 'records') {
+      loadAllRecords();
+    } else if (this.getAttribute('data-page') === 'ranks') {
+      loadClassRanks();
+    }
+  });
+});
+
+// 加载小组排名
+function loadClassRanks() {
+  fetch('/api/student/class-ranks', {
+    headers: {
+      'Authorization': token
+    }
+  })
+  .then(response => {
+    if (response.status === 401) {
+      throw new Error('认证失效');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      const container = document.getElementById('classRanksContainer');
+      
+      let ranksHtml = '';
+      
+      // 显示前三名小组
+      if (data.data.topThree && data.data.topThree.length > 0) {
+        ranksHtml += '<h3 class="section-title">前三名小组</h3>';
+        
+        data.data.topThree.forEach(classRank => {
+          let rankClass = '';
+          if (classRank.rank === 1) rankClass = 'top-rank';
+          else if (classRank.rank === 2) rankClass = 'second-rank';
+          else if (classRank.rank === 3) rankClass = 'third-rank';
+          
+          ranksHtml += `
+            <div class="rank-item ${rankClass}">
+              <div class="rank-header">
+                <div class="rank-position">
+                  <span class="rank-badge rank-${classRank.rank}">第${classRank.rank}名</span>
+                </div>
+                <div class="rank-class">${classRank.className}</div>
+                <div class="rank-score">平均分: ${classRank.averageScore}</div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      // 显示本小组排名
+      if (data.data.currentClass) {
+        const currentClass = data.data.currentClass;
+        ranksHtml += '<h3 class="section-title" style="margin-top: 2rem;">本组情况</h3>';
+        ranksHtml += `
+          <div class="rank-item">
+            <div class="rank-header">
+              <div class="rank-position">
+                <span class="rank-badge rank-${currentClass.rank}">第${currentClass.rank}名</span>
+              </div>
+              <div class="rank-class">${currentClass.className}</div>
+              <div class="rank-score">平均分: ${currentClass.averageScore}</div>
+            </div>
+            <div class="rank-students">
+              ${currentClass.students.map((student, index) => `
+                <div class="student-rank-item ${student.id === studentInfo.id ? 'current-student' : ''}">
+                  <span class="student-name">${index + 1}. ${student.name} ${student.id === studentInfo.id ? '(我)' : ''}</span>
+                  <span class="student-score">${student.score}分</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      container.innerHTML = ranksHtml || '<div class="empty-state">暂无排名数据</div>';
+    }
+  })
+  .catch(error => {
+    console.error('加载小组排名错误:', error);
+    if (error.message === '认证失效') {
+      localStorage.removeItem('studentToken');
+      localStorage.removeItem('studentInfo');
+      window.location.href = 'login.html';
+    }
+  });
+}
+        
+        // 初始加载分数数据
+        loadScoreData();
+    </script>
+</body>
+</html>
