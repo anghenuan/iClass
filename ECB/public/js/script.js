@@ -1,654 +1,235 @@
-/* 基础样式 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f5f7fa;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* 导航栏 */
-.navbar {
-  background-color: #2c3e50;
-  color: white;
-  padding: 1rem 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.navbar .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.nav-links a:hover {
-  background-color: #34495e;
-}
-
-/* 主内容区 */
-.main-content {
-  min-height: calc(100vh - 140px);
-  padding: 2rem 0;
-}
-
-/* 卡片样式 */
-.card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-/* 按钮样式 */
-.btn {
-  display: inline-block;
-  padding: 0.5rem 1.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-.btn:hover {
-  background-color: #2980b9;
-}
-
-.btn-primary {
-  background-color: #3498db;
-}
-
-.btn-success {
-  background-color: #2ecc71;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-}
-
-.btn-warning {
-  background-color: #f39c12;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-/* 表单样式 */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* 表格样式 */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-
-.table th,
-.table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-}
-
-.table tr:hover {
-  background-color: #f8f9fa;
-}
-
-.table-responsive {
-  overflow-x: auto;
-}
-
-/* 表格行状态 */
-.table-row-deleted {
-  background-color: #fef5e7 !important;
-}
-
-.table-row-deleted:hover {
-  background-color: #fef9e7 !important;
-}
-
-/* 状态标签样式 */
-.status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.status-active {
-  background-color: #d5f4e6;
-  color: #27ae60;
-}
-
-.status-deleted {
-  background-color: #fadbd8;
-  color: #e74c3c;
-}
-
-/* 删除原因样式 */
-.delete-reason {
-  font-size: 0.9rem;
-  color: #e74c3c;
-  padding: 0.5rem;
-  background-color: #fef5e7;
-  border-left: 3px solid #f39c12;
-  border-radius: 4px;
-  margin-top: 0.5rem;
-}
-
-/* 操作按钮组 */
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-/* 题目样式 */
-.problem-card {
-  border-left: 4px solid #3498db;
-  transition: transform 0.2s;
-}
-
-.problem-card:hover {
-  transform: translateY(-2px);
-}
-
-.problem-title {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-
-.problem-meta {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-/* Markdown 内容样式 */
-.markdown-content {
-  line-height: 1.8;
-}
-
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-}
-
-.markdown-content p {
-  margin-bottom: 1rem;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  margin-bottom: 1rem;
-  padding-left: 2rem;
-}
-
-.markdown-content code {
-  background-color: #f8f9fa;
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-family: 'Courier New', monospace;
-}
-
-.markdown-content pre {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-
-.markdown-content pre code {
-  background-color: transparent;
-  padding: 0;
-}
-
-.markdown-content blockquote {
-  border-left: 4px solid #3498db;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #555;
-  font-style: italic;
-}
-
-.markdown-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-
-.markdown-content table th,
-.markdown-content table td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-}
-
-.markdown-content table th {
-  background-color: #f8f9fa;
-}
-
-/* 答题表单 */
-.question-item {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background-color: #fafafa;
-}
-
-.question-text {
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-}
-
-.options-list {
-  list-style: none;
-}
-
-.option-item {
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.option-item:hover {
-  background-color: #e8f4fc;
-}
-
-.option-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.option-input {
-  margin-right: 0.75rem;
-}
-
-.option-text {
-  font-size: 1rem;
-}
-
-/* 结果页面 */
-.result-correct {
-  color: #27ae60;
-  background-color: #d5f4e6;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.result-incorrect {
-  color: #e74c3c;
-  background-color: #fadbd8;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.result-explanation {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 4px;
-  border-left: 4px solid #3498db;
-  margin-top: 1rem;
-}
-
-/* 图片网格 */
-.images-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.image-item {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  padding: 1rem;
-  text-align: center;
-}
-
-.image-item img {
-  max-width: 100%;
-  max-height: 200px;
-  margin-bottom: 0.5rem;
-}
-
-/* 排名页面 */
-.ranking-table {
-  margin-top: 2rem;
-}
-
-.ranking-item {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.ranking-rank {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #3498db;
-  min-width: 60px;
-}
-
-.ranking-info {
-  flex: 1;
-}
-
-.ranking-score {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .nav-links {
-    flex-direction: column;
-    gap: 0.5rem;
+// 动态添加题目表单
+let questionCount = 1;
+
+function addQuestion() {
+  const container = document.getElementById('questions-container');
+  const questionDiv = document.createElement('div');
+  questionDiv.className = 'question-item card';
+  questionDiv.innerHTML = `
+    <h4>题目 ${questionCount + 1}</h4>
+    <div class="form-group">
+      <label class="form-label">题目类型</label>
+      <select name="type_${questionCount}" class="form-control question-type" onchange="updateQuestionType(${questionCount})">
+        <option value="choice">选择题</option>
+        <option value="fill">填空题</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">题目描述</label>
+      <textarea name="question_${questionCount}" class="form-control" rows="2" placeholder="请输入题目描述..."></textarea>
+    </div>
+    <div class="form-group" id="options_${questionCount}">
+      <label class="form-label">选项数量</label>
+      <select name="optionCount_${questionCount}" class="form-control option-count" onchange="updateOptions(${questionCount})">
+        <option value="2">2个选项</option>
+        <option value="3">3个选项</option>
+        <option value="4" selected>4个选项</option>
+        <option value="5">5个选项</option>
+        <option value="6">6个选项</option>
+      </select>
+      <div class="options-list mt-2" id="optionsList_${questionCount}">
+        <!-- 选项将通过JavaScript动态生成 -->
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">正确答案</label>
+      <input type="text" name="correctAnswer_${questionCount}" class="form-control" placeholder="请输入正确答案（如A、B、C或具体答案）">
+    </div>
+    <div class="form-group">
+      <label class="form-label">题目解析（可选）</label>
+      <textarea name="explanation_${questionCount}" class="form-control" rows="2" placeholder="请输入题目解析..."></textarea>
+    </div>
+    <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(this)">删除此题</button>
+  `;
+  container.appendChild(questionDiv);
+  questionCount++;
+  
+  // 初始化新题目的选项
+  updateOptions(questionCount - 1);
+}
+
+function removeQuestion(button) {
+  const questionDiv = button.closest('.question-item');
+  questionDiv.remove();
+  
+  // 重新编号所有题目
+  const questions = document.querySelectorAll('.question-item');
+  questions.forEach((question, index) => {
+    const questionNumber = index;
+    const title = question.querySelector('h4');
+    title.textContent = `题目 ${questionNumber + 1}`;
+    
+    // 更新所有输入字段的名称
+    const inputs = question.querySelectorAll('[name^="type_"], [name^="question_"], [name^="optionCount_"], [name^="correctAnswer_"], [name^="explanation_"]');
+    inputs.forEach(input => {
+      const oldName = input.name;
+      const parts = oldName.split('_');
+      parts[1] = questionNumber;
+      input.name = parts.join('_');
+      
+      if (input.classList.contains('question-type')) {
+        input.setAttribute('onchange', `updateQuestionType(${questionNumber})`);
+      }
+      if (input.classList.contains('option-count')) {
+        input.setAttribute('onchange', `updateOptions(${questionNumber})`);
+      }
+    });
+    
+    // 更新选项列表的ID
+    const optionsDiv = question.querySelector(`[id^="options_"]`);
+    const optionsList = question.querySelector(`[id^="optionsList_"]`);
+    if (optionsDiv) optionsDiv.id = `options_${questionNumber}`;
+    if (optionsList) optionsList.id = `optionsList_${questionNumber}`;
+    
+    // 重新生成选项
+    if (question.querySelector('.option-count')) {
+      updateOptions(questionNumber);
+    }
+  });
+  
+  questionCount = questions.length;
+}
+
+function updateQuestionType(questionIndex) {
+  const questionDiv = document.querySelector(`[name="type_${questionIndex}"]`).closest('.question-item');
+  const optionsDiv = questionDiv.querySelector(`#options_${questionIndex}`);
+  const correctAnswerInput = questionDiv.querySelector(`[name="correctAnswer_${questionIndex}"]`);
+  
+  const type = document.querySelector(`[name="type_${questionIndex}"]`).value;
+  
+  if (type === 'choice') {
+    optionsDiv.style.display = 'block';
+    correctAnswerInput.placeholder = '请输入正确答案（如A、B、C等）';
+  } else {
+    optionsDiv.style.display = 'none';
+    correctAnswerInput.placeholder = '请输入正确答案（具体答案）';
+  }
+}
+
+function updateOptions(questionIndex) {
+  const optionCount = parseInt(document.querySelector(`[name="optionCount_${questionIndex}"]`).value);
+  const optionsList = document.getElementById(`optionsList_${questionIndex}`);
+  
+  optionsList.innerHTML = '';
+  
+  for (let i = 0; i < optionCount; i++) {
+    const optionLetter = String.fromCharCode(65 + i); // A, B, C...
+    const optionDiv = document.createElement('div');
+    optionDiv.className = 'form-group';
+    optionDiv.innerHTML = `
+      <label class="form-label">选项 ${optionLetter}</label>
+      <input type="text" name="option_${questionIndex}_${i}" class="form-control" placeholder="请输入选项 ${optionLetter} 的内容">
+    `;
+    optionsList.appendChild(optionDiv);
+  }
+}
+
+// Markdown上传/粘贴切换
+function toggleMarkdownInput() {
+  const fileInput = document.getElementById('markdownFileInput');
+  const textInput = document.getElementById('markdownTextInput');
+  const toggleBtn = document.getElementById('toggleMarkdownBtn');
+  
+  if (fileInput.style.display === 'none') {
+    fileInput.style.display = 'block';
+    textInput.style.display = 'none';
+    toggleBtn.textContent = '切换到文本输入';
+  } else {
+    fileInput.style.display = 'none';
+    textInput.style.display = 'block';
+    toggleBtn.textContent = '切换到文件上传';
+  }
+}
+
+// 动态添加图片上传字段
+function addImageUpload() {
+  const container = document.getElementById('imageUploads');
+  const newItem = document.createElement('div');
+  newItem.className = 'image-upload-item';
+  newItem.style.marginBottom = '1rem';
+  newItem.innerHTML = `
+    <div class="row" style="display: flex; gap: 10px; align-items: center;">
+      <div style="flex: 1;">
+        <input type="file" name="images" class="form-control" accept="image/*">
+      </div>
+      <div style="flex: 1;">
+        <input type="text" name="imageNames" class="form-control" placeholder="图片名称">
+      </div>
+      <div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeImageUpload(this)">删除</button>
+      </div>
+    </div>
+  `;
+  container.appendChild(newItem);
+}
+
+function removeImageUpload(button) {
+  const item = button.closest('.image-upload-item');
+  item.remove();
+}
+
+// 文件上传预览
+function previewMarkdownFile(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('markdownText').value = e.target.result;
+    };
+    reader.readAsText(input.files[0]);
+  }
+}
+
+// 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+  // 初始化第一个题目的选项
+  if (document.querySelector('.option-count')) {
+    updateOptions(0);
   }
   
-  .container {
-    padding: 0 10px;
-  }
+  // 表单验证
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      let isValid = true;
+      const requiredFields = form.querySelectorAll('[required]');
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.style.borderColor = '#e74c3c';
+        } else {
+          field.style.borderColor = '#ddd';
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        alert('请填写所有必填字段');
+      }
+    });
+  });
   
-  .card {
-    padding: 1rem;
-  }
+  // 自动隐藏消息提示
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(alert => {
+    setTimeout(() => {
+      alert.style.opacity = '0';
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 300);
+    }, 5000);
+  });
   
-  .table {
-    font-size: 0.9rem;
-  }
-  
-  .images-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-}
-
-/* 消息提示 */
-.alert {
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-.alert-success {
-  background-color: #d5f4e6;
-  color: #27ae60;
-  border: 1px solid #a3e9c4;
-}
-
-.alert-error {
-  background-color: #fadbd8;
-  color: #e74c3c;
-  border: 1px solid #f5b7b1;
-}
-
-.alert-warning {
-  background-color: #fef5e7;
-  color: #f39c12;
-  border: 1px solid #fad7a0;
-}
-
-/* 网格布局 */
-.problems-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-/* 英雄区域 */
-.hero-section {
-  text-align: center;
-  padding: 4rem 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-}
-
-/* 功能卡片 */
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.feature-card {
-  text-align: center;
-}
-
-.feature-card i {
-  font-size: 3rem;
-  color: #3498db;
-  margin-bottom: 1rem;
-}
-
-/* 行布局 */
-.row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* 图标系统 */
-.icon {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    stroke-width: 0;
-    stroke: currentColor;
-    fill: currentColor;
-    vertical-align: -0.125em;
-}
-
-.icon-sm {
-    width: 0.875em;
-    height: 0.875em;
-}
-
-.icon-md {
-    width: 1.25em;
-    height: 1.25em;
-}
-
-.icon-lg {
-    width: 1.5em;
-    height: 1.5em;
-}
-
-.icon-xl {
-    width: 2em;
-    height: 2em;
-}
-
-.icon-2xl {
-    width: 3em;
-    height: 3em;
-}
-
-/* 图标按钮 */
-.icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background-color: #f8f9fa;
-    color: #495057;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.icon-btn:hover {
-    background-color: #e9ecef;
-    color: #212529;
-    transform: translateY(-1px);
-}
-
-.icon-btn-primary {
-    background-color: #3498db;
-    color: white;
-}
-
-.icon-btn-primary:hover {
-    background-color: #2980b9;
-}
-
-.icon-btn-success {
-    background-color: #2ecc71;
-    color: white;
-}
-
-.icon-btn-success:hover {
-    background-color: #27ae60;
-}
-
-.icon-btn-danger {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.icon-btn-danger:hover {
-    background-color: #c0392b;
-}
-
-.icon-btn-warning {
-    background-color: #f39c12;
-    color: white;
-}
-
-.icon-btn-warning:hover {
-    background-color: #d68910;
-}
-
-/* 特性图标 */
-.feature-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 4rem;
-    height: 4rem;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-}
-
-.feature-icon-primary {
-    background-color: rgba(52, 152, 219, 0.1);
-    color: #3498db;
-}
-
-.feature-icon-success {
-    background-color: rgba(46, 204, 113, 0.1);
-    color: #2ecc71;
-}
-
-.feature-icon-warning {
-    background-color: rgba(243, 156, 18, 0.1);
-    color: #f39c12;
-}
-
-/* 状态图标 */
-.status-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
-    margin-right: 0.5rem;
-}
-
-.status-icon-correct {
-    background-color: #d5f4e6;
-    color: #27ae60;
-}
-
-.status-icon-incorrect {
-    background-color: #fadbd8;
-    color: #e74c3c;
-}
-
-.status-icon-pending {
-    background-color: #fef5e7;
-    color: #f39c12;
-}
+  // 管理员删除表单验证
+  const deleteForms = document.querySelectorAll('form[action*="/admin/delete-problem/"]');
+  deleteForms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const reasonInput = this.querySelector('input[name="reason"]');
+      if (!reasonInput.value.trim()) {
+        e.preventDefault();
+        alert('请填写删除原因');
+        reasonInput.focus();
+      }
+    });
+  });
+});
