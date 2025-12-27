@@ -1,0 +1,14 @@
+browser_project/
+├── browser.py              # 主程序
+├── new_tab.py             # 新标签页UI
+├── script_injector.py     # 脚本注入器
+├── icons/                 # 图标文件夹
+│   ├── back.png
+│   ├── forward.png
+│   ├── refresh.png
+│   ├── home.png
+│   ├── menu.png
+│   └── ...
+├── scripts/               # 脚本文件夹
+│   └── example.user.js
+└── requirements.txt       # 依赖包

@@ -1,0 +1,799 @@
+"""
+新标签页 - 修复版本
+移除localStorage依赖，改用sessionStorage
+"""
+
+import os
+import json
+from datetime import datetime
+import pytz
+from pathlib import Path
+
+class NewTabPage:
+    """新标签页生成器"""
+    
+    def __init__(self):
+        self.quick_links = [
+            {"name": "Bing", "url": "https://www.bing.com", "icon": "https://www.bing.com/favicon.ico"},
+            {"name": "Bilibili", "url": "https://www.bilibili.com", "icon": "https://www.bilibili.com/favicon.ico"},
+            {"name": "GitHub", "url": "https://github.com", "icon": "https://github.com/favicon.ico"},
+            {"name": "DeepSeek", "url": "https://chat.deepseek.com", "icon": "https://chat.deepseek.com/favicon.ico"}
+        ]
+        
+        # 加载用户自定义的快速链接
+        self.load_user_links()
+    
+    def load_user_links(self):
+        """加载用户自定义的快速链接"""
+        config_file = Path("quick_links.json")
+        if config_file.exists():
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    user_links = json.load(f)
+                    self.quick_links.extend(user_links)
+            except:
+                pass
+    
+    def generate_html(self):
+        """生成新标签页的HTML内容"""
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>新标签页</title>
+            <style>
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+                }}
+                
+                body {{
+                    background-color: var(--bg-color);
+                    color: var(--text-color);
+                    transition: background-color 0.3s, color 0.3s;
+                    min-height: 100vh;
+                    padding: 20px;
+                }}
+                
+                :root {{
+                    --bg-color: #f3f3f3;
+                    --text-color: #333;
+                    --card-bg: white;
+                    --primary-color: #0078d4;
+                    --secondary-color: #605e5c;
+                    --hover-color: #f0f0f0;
+                }}
+                
+                body.dark {{
+                    --bg-color: #202124;
+                    --text-color: #e8eaed;
+                    --card-bg: #2d2d30;
+                    --primary-color: #4a90e2;
+                    --secondary-color: #a6a6a6;
+                    --hover-color: #3c3c3c;
+                }}
+                
+                .container {{
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }}
+                
+                /* 搜索框样式 */
+                .search-container {{
+                    text-align: center;
+                    margin: 60px auto 40px;
+                }}
+                
+                .logo {{
+                    font-size: 48px;
+                    font-weight: 300;
+                    color: var(--primary-color);
+                    margin-bottom: 20px;
+                }}
+                
+                .search-box {{
+                    max-width: 600px;
+                    margin: 0 auto;
+                    position: relative;
+                }}
+                
+                .search-input {{
+                    width: 100%;
+                    padding: 16px 24px;
+                    padding-right: 60px;
+                    font-size: 16px;
+                    border: 2px solid #ddd;
+                    border-radius: 30px;
+                    background-color: var(--card-bg);
+                    color: var(--text-color);
+                    outline: none;
+                    transition: border-color 0.3s;
+                }}
+                
+                .search-input:focus {{
+                    border-color: var(--primary-color);
+                }}
+                
+                .search-button {{
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    color: var(--secondary-color);
+                    cursor: pointer;
+                    padding: 8px;
+                }}
+                
+                /* 主要内容区域 */
+                .main-content {{
+                    display: flex;
+                    gap: 30px;
+                    margin-top: 40px;
+                }}
+                
+                .left-panel {{
+                    flex: 1;
+                }}
+                
+                .right-panel {{
+                    width: 300px;
+                }}
+                
+                /* 时钟和日期样式 */
+                .time-date-card {{
+                    background-color: var(--card-bg);
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    margin-bottom: 20px;
+                }}
+                
+                .time-display {{
+                    font-size: 48px;
+                    font-weight: 300;
+                    margin-bottom: 10px;
+                }}
+                
+                .date-display {{
+                    font-size: 20px;
+                    color: var(--secondary-color);
+                    margin-bottom: 15px;
+                }}
+                
+                .weekday-display {{
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: var(--primary-color);
+                }}
+                
+                /* 日历样式 */
+                .calendar-card {{
+                    background-color: var(--card-bg);
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    margin-bottom: 20px;
+                }}
+                
+                .calendar-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }}
+                
+                .calendar-title {{
+                    font-size: 18px;
+                    font-weight: 500;
+                }}
+                
+                .calendar-nav button {{
+                    background: none;
+                    border: none;
+                    color: var(--secondary-color);
+                    cursor: pointer;
+                    padding: 5px 10px;
+                    font-size: 16px;
+                }}
+                
+                .calendar-weekdays, .calendar-days {{
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 5px;
+                }}
+                
+                .calendar-weekdays div {{
+                    text-align: center;
+                    padding: 10px 0;
+                    font-weight: 500;
+                    color: var(--secondary-color);
+                }}
+                
+                .calendar-days div {{
+                    text-align: center;
+                    padding: 10px 0;
+                    cursor: pointer;
+                    border-radius: 50%;
+                    width: 36px;
+                    height: 36px;
+                    line-height: 36px;
+                    margin: 0 auto;
+                }}
+                
+                .calendar-days div.today {{
+                    background-color: var(--primary-color);
+                    color: white;
+                }}
+                
+                .calendar-days div.other-month {{
+                    color: #aaa;
+                }}
+                
+                .calendar-days div:hover {{
+                    background-color: var(--hover-color);
+                }}
+                
+                /* 天气样式 */
+                .weather-card {{
+                    background-color: var(--card-bg);
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                }}
+                
+                .weather-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 15px;
+                }}
+                
+                .weather-location {{
+                    font-size: 18px;
+                    font-weight: 500;
+                }}
+                
+                .weather-refresh {{
+                    background: none;
+                    border: none;
+                    color: var(--secondary-color);
+                    cursor: pointer;
+                    padding: 5px;
+                }}
+                
+                .weather-main {{
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 15px;
+                }}
+                
+                .weather-icon {{
+                    font-size: 48px;
+                    margin-right: 15px;
+                }}
+                
+                .weather-temp {{
+                    font-size: 36px;
+                    font-weight: 300;
+                }}
+                
+                .weather-desc {{
+                    color: var(--secondary-color);
+                    margin-bottom: 15px;
+                }}
+                
+                .weather-details {{
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                }}
+                
+                .weather-detail {{
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 8px 0;
+                    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+                }}
+                
+                /* 快速链接样式 */
+                .quick-links-card {{
+                    background-color: var(--card-bg);
+                    border-radius: 12px;
+                    padding: 24px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    margin-top: 20px;
+                }}
+                
+                .quick-links-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }}
+                
+                .quick-links-title {{
+                    font-size: 18px;
+                    font-weight: 500;
+                }}
+                
+                .quick-links-grid {{
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                    gap: 20px;
+                }}
+                
+                .quick-link {{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-decoration: none;
+                    color: var(--text-color);
+                    padding: 15px 10px;
+                    border-radius: 8px;
+                    transition: background-color 0.2s, transform 0.2s;
+                    cursor: pointer;
+                }}
+                
+                .quick-link:hover {{
+                    background-color: var(--hover-color);
+                    transform: translateY(-2px);
+                }}
+                
+                .quick-link-icon {{
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 8px;
+                    background-color: var(--bg-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 10px;
+                    overflow: hidden;
+                }}
+                
+                .quick-link-icon img {{
+                    width: 32px;
+                    height: 32px;
+                    object-fit: contain;
+                }}
+                
+                .quick-link-name {{
+                    font-size: 14px;
+                    text-align: center;
+                    word-break: break-word;
+                }}
+                
+                /* 主题切换按钮 */
+                .theme-toggle {{
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 1000;
+                }}
+                
+                .theme-button {{
+                    background-color: var(--card-bg);
+                    border: none;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    color: var(--text-color);
+                }}
+            </style>
+            <title>新建标签页</title>
+        </head>
+        <body class="light">
+            <div class="theme-toggle">
+                <button class="theme-button" id="themeToggle">
+                    <span id="themeIcon">🌙</span>
+                </button>
+            </div>
+            
+            <div class="container">
+                <!-- 搜索框 -->
+                <div class="search-container">
+                    <div class="logo">RickBrowser</div>
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="在Bing上搜索或输入网址">
+                        <button class="search-button" id="searchButton">🔍</button>
+                    </div>
+                </div>
+                
+                <!-- 主要内容 -->
+                <div class="main-content">
+                    <!-- 左侧面板 -->
+                    <div class="left-panel">
+                        <!-- 时钟和日期 -->
+                        <div class="time-date-card">
+                            <div class="time-display" id="timeDisplay">00:00:00</div>
+                            <div class="date-display" id="dateDisplay">2023年01月01日</div>
+                            <div class="weekday-display" id="weekdayDisplay">月曜日</div>
+                        </div>
+                        
+                        <!-- 快速链接 -->
+                        <div class="quick-links-card">
+                            <div class="quick-links-header">
+                                <div class="quick-links-title">快速链接</div>
+                            </div>
+                            <div class="quick-links-grid" id="quickLinksGrid">
+                                {self.generate_quick_links_html()}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧面板 -->
+                    <div class="right-panel">
+                        <!-- 日历 -->
+                        <div class="calendar-card">
+                            <div class="calendar-header">
+                                <div class="calendar-title" id="calendarTitle">2023年1月</div>
+                                <div class="calendar-nav">
+                                    <button id="prevMonth">‹</button>
+                                    <button id="nextMonth">›</button>
+                                </div>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays">
+                                <!-- 日历日期将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 天气 -->
+                        <div class="weather-card">
+                            <div class="weather-header">
+                                <div class="weather-location" id="weatherLocation">获取位置中...</div>
+                                <button class="weather-refresh" id="refreshWeather">↻</button>
+                            </div>
+                            <div class="weather-main">
+                                <div class="weather-icon" id="weatherIcon">☀️</div>
+                                <div class="weather-temp" id="weatherTemp">--°C</div>
+                            </div>
+                            <div class="weather-desc" id="weatherDesc">获取天气信息中...</div>
+                            <div class="weather-details" id="weatherDetails">
+                                <!-- 天气详情将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                // 初始数据
+                let quickLinks = {json.dumps(self.quick_links, ensure_ascii=False)};
+                
+                // DOM元素
+                const timeDisplay = document.getElementById('timeDisplay');
+                const dateDisplay = document.getElementById('dateDisplay');
+                const weekdayDisplay = document.getElementById('weekdayDisplay');
+                const searchInput = document.getElementById('searchInput');
+                const searchButton = document.getElementById('searchButton');
+                const themeToggle = document.getElementById('themeToggle');
+                const themeIcon = document.getElementById('themeIcon');
+                const quickLinksGrid = document.getElementById('quickLinksGrid');
+                const calendarTitle = document.getElementById('calendarTitle');
+                const calendarDays = document.getElementById('calendarDays');
+                const prevMonthButton = document.getElementById('prevMonth');
+                const nextMonthButton = document.getElementById('nextMonth');
+                const weatherLocation = document.getElementById('weatherLocation');
+                const weatherIcon = document.getElementById('weatherIcon');
+                const weatherTemp = document.getElementById('weatherTemp');
+                const weatherDesc = document.getElementById('weatherDesc');
+                const weatherDetails = document.getElementById('weatherDetails');
+                const refreshWeather = document.getElementById('refreshWeather');
+                
+                // 日历相关变量
+                let currentDate = new Date();
+                let currentYear = currentDate.getFullYear();
+                let currentMonth = currentDate.getMonth();
+                
+                // 星期几的日语表示
+                const weekdaysJP = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+                
+                // 初始化
+                document.addEventListener('DOMContentLoaded', function() {{
+                    // 初始化主题
+                    initializeTheme();
+                    
+                    // 更新时间
+                    updateTime();
+                    setInterval(updateTime, 1000);
+                    
+                    // 初始化日历
+                    renderCalendar(currentYear, currentMonth);
+                    
+                    // 获取天气信息
+                    getWeather();
+                    
+                    // 事件监听器
+                    themeToggle.addEventListener('click', toggleTheme);
+                    
+                    prevMonthButton.addEventListener('click', function() {{
+                        currentMonth--;
+                        if (currentMonth < 0) {{
+                            currentMonth = 11;
+                            currentYear--;
+                        }}
+                        renderCalendar(currentYear, currentMonth);
+                    }});
+                    
+                    nextMonthButton.addEventListener('click', function() {{
+                        currentMonth++;
+                        if (currentMonth > 11) {{
+                            currentMonth = 0;
+                            currentYear++;
+                        }}
+                        renderCalendar(currentYear, currentMonth);
+                    }});
+                    
+                    refreshWeather.addEventListener('click', getWeather);
+                }});
+                
+                // 初始化主题
+                function initializeTheme() {{
+                    // 默认使用浅色主题
+                    document.body.className = 'light';
+                    if (themeIcon) {{
+                        themeIcon.textContent = '🌙';
+                    }}
+                }}
+                
+                // 切换主题
+                function toggleTheme() {{
+                    const currentTheme = document.body.className;
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.body.className = newTheme;
+                    if (themeIcon) {{
+                        themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+                    }}
+                }}
+                
+                // 更新时间和日期（日本格式）
+                function updateTime() {{
+                    const now = new Date();
+                    
+                    // 转换为日本时间
+                    const japanTime = new Date(now.toLocaleString('en-US', {{ 
+                        timeZone: 'Asia/Tokyo' 
+                    }}));
+                    
+                    // 格式化时间 (hh時間mm分ss秒)
+                    const hours = japanTime.getHours().toString().padStart(2, '0');
+                    const minutes = japanTime.getMinutes().toString().padStart(2, '0');
+                    const seconds = japanTime.getSeconds().toString().padStart(2, '0');
+                    if (timeDisplay) {{
+                        chineseHours = hours - 1;
+                        timeDisplay.textContent = `${{chineseHours}}時間${{minutes}}分${{seconds}}秒`;
+                    }}
+                    
+                    // 格式化日期 (YYYY年MM月DD日)
+                    const year = japanTime.getFullYear();
+                    const month = (japanTime.getMonth() + 1).toString().padStart(2, '0');
+                    const day = japanTime.getDate().toString().padStart(2, '0');
+                    if (dateDisplay) {{
+                        dateDisplay.textContent = `${{year}}年${{month}}月${{day}}日`;
+                    }}
+                    
+                    // 星期几 (X曜日)
+                    const weekday = japanTime.getDay();
+                    if (weekdayDisplay) {{
+                        weekdayDisplay.textContent = weekdaysJP[weekday];
+                    }}
+                }}
+                
+                // 渲染日历
+                function renderCalendar(year, month) {{
+                    if (!calendarTitle || !calendarDays) return;
+                    
+                    // 更新日历标题
+                    calendarTitle.textContent = `${{year}}年${{month + 1}}月`;
+                    
+                    // 获取当月第一天和最后一天
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    const today = new Date();
+                    
+                    // 清空日历
+                    calendarDays.innerHTML = '';
+                    
+                    // 添加上个月最后几天
+                    const firstDayOfWeek = firstDay.getDay();
+                    const prevMonthLastDay = new Date(year, month, 0).getDate();
+                    
+                    for (let i = firstDayOfWeek - 1; i >= 0; i--) {{
+                        const day = document.createElement('div');
+                        day.textContent = prevMonthLastDay - i;
+                        day.className = 'other-month';
+                        calendarDays.appendChild(day);
+                    }}
+                    
+                    // 添加当月日期
+                    for (let i = 1; i <= lastDay.getDate(); i++) {{
+                        const day = document.createElement('div');
+                        day.textContent = i;
+                        
+                        // 检查是否是今天
+                        if (year === today.getFullYear() && 
+                            month === today.getMonth() && 
+                            i === today.getDate()) {{
+                            day.className = 'today';
+                        }}
+                        
+                        calendarDays.appendChild(day);
+                    }}
+                    
+                    // 添加下个月前几天
+                    const totalCells = 42; // 6行 * 7列
+                    const remainingCells = totalCells - (firstDayOfWeek + lastDay.getDate());
+                    
+                    for (let i = 1; i <= remainingCells; i++) {{
+                        const day = document.createElement('div');
+                        day.textContent = i;
+                        day.className = 'other-month';
+                        calendarDays.appendChild(day);
+                    }}
+                }}
+                
+                // 获取天气信息
+                async function getWeather() {{
+                    try {{
+                        // 使用Open-Meteo API获取天气（免费，无需API密钥）
+                        const positionResponse = await fetch('https://ipapi.co/json/');
+                        const positionData = await positionResponse.json();
+                        
+                        const latitude = positionData.latitude || 35.6895;
+                        const longitude = positionData.longitude || 139.6917;
+                        const city = positionData.city || '东京';
+                        const country = positionData.country_name || '日本';
+                        
+                        if (weatherLocation) {{
+                            weatherLocation.textContent = `${{city}}, ${{country}}`;
+                        }}
+                        
+                        // 获取天气数据
+                        const weatherResponse = await fetch(
+                            `https://api.open-meteo.com/v1/forecast?latitude=${{latitude}}&longitude=${{longitude}}&current_weather=true`
+                        );
+                        const weatherData = await weatherResponse.json();
+                        
+                        if (weatherData.current_weather) {{
+                            const temp = Math.round(weatherData.current_weather.temperature);
+                            const weatherCode = weatherData.current_weather.weathercode;
+                            
+                            if (weatherTemp) {{
+                                weatherTemp.textContent = `${{temp}}°C`;
+                            }}
+                            
+                            // 根据天气代码获取描述和图标
+                            const weatherInfo = getWeatherInfo(weatherCode);
+                            if (weatherIcon) {{
+                                weatherIcon.textContent = weatherInfo.icon;
+                            }}
+                            if (weatherDesc) {{
+                                weatherDesc.textContent = weatherInfo.description;
+                            }}
+                            
+                            // 添加天气详情
+                            if (weatherDetails) {{
+                                weatherDetails.innerHTML = `
+                                    <div class="weather-detail">
+                                        <span>体感温度</span>
+                                        <span>${{temp}}°C</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span>风速</span>
+                                        <span>${{weatherData.current_weather.windspeed}} km/h</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span>风向</span>
+                                        <span>${{weatherData.current_weather.winddirection}}°</span>
+                                    </div>
+                                    <div class="weather-detail">
+                                        <span>更新时间</span>
+                                        <span>${{new Date(weatherData.current_weather.time).toLocaleTimeString()}}</span>
+                                    </div>
+                                `;
+                            }}
+                        }}
+                    }} catch (error) {{
+                        console.error('获取天气信息失败:', error);
+                        if (weatherDesc) {{
+                            weatherDesc.textContent = '无法获取天气信息';
+                        }}
+                    }}
+                }}
+                
+                // 根据天气代码获取天气信息和图标
+                function getWeatherInfo(weatherCode) {{
+                    // WMO天气代码解释
+                    const weatherCodes = {{
+                        0: {{ description: '晴朗', icon: '☀️' }},
+                        1: {{ description: '大部分晴朗', icon: '🌤️' }},
+                        2: {{ description: '局部多云', icon: '⛅' }},
+                        3: {{ description: '多云', icon: '☁️' }},
+                        45: {{ description: '雾', icon: '🌫️' }},
+                        48: {{ description: '冻雾', icon: '🌫️' }},
+                        51: {{ description: '毛毛雨', icon: '🌧️' }},
+                        53: {{ description: '毛毛雨', icon: '🌧️' }},
+                        55: {{ description: '密集毛毛雨', icon: '🌧️' }},
+                        56: {{ description: '冻毛毛雨', icon: '🌧️❄️' }},
+                        57: {{ description: '密集冻毛毛雨', icon: '🌧️❄️' }},
+                        61: {{ description: '小雨', icon: '🌦️' }},
+                        63: {{ description: '中雨', icon: '🌧️' }},
+                        65: {{ description: '大雨', icon: '⛈️' }},
+                        66: {{ description: '冻雨', icon: '🌧️❄️' }},
+                        67: {{ description: '密集冻雨', icon: '🌧️❄️' }},
+                        71: {{ description: '小雪', icon: '🌨️' }},
+                        73: {{ description: '中雪', icon: '🌨️' }},
+                        75: {{ description: '大雪', icon: '❄️' }},
+                        77: {{ description: '雪粒', icon: '🌨️' }},
+                        80: {{ description: '阵雨', icon: '🌦️' }},
+                        81: {{ description: '强阵雨', icon: '🌧️' }},
+                        82: {{ description: '猛烈阵雨', icon: '⛈️' }},
+                        85: {{ description: '阵雪', icon: '🌨️' }},
+                        86: {{ description: '强阵雪', icon: '❄️' }},
+                        95: {{ description: '雷暴', icon: '⛈️' }},
+                        96: {{ description: '雷暴伴有冰雹', icon: '⛈️🧊' }},
+                        99: {{ description: '强雷暴伴有冰雹', icon: '⛈️🧊' }}
+                    }};
+                    
+                    return weatherCodes[weatherCode] || {{ description: '未知', icon: '❓' }};
+                }}
+                
+                // 渲染快速链接
+                function renderQuickLinks() {{
+                    if (!quickLinksGrid) return;
+                    
+                    quickLinksGrid.innerHTML = '';
+                    
+                    quickLinks.forEach((link, index) => {{
+                        const linkElement = document.createElement('div');
+                        linkElement.className = 'quick-link';
+                        linkElement.setAttribute('data-url', link.url);
+                        linkElement.innerHTML = `
+                            <div class="quick-link-icon">
+                                <img src="${{link.icon}}" alt="${{link.name}}" 
+                                     onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${{new URL(link.url).hostname}}&sz=32'">
+                            </div>
+                            <div class="quick-link-name">${{link.name}}</div>
+                        `;
+                        
+                        quickLinksGrid.appendChild(linkElement);
+                    }});
+                }}
+                
+                // 初始化渲染快速链接
+                renderQuickLinks();
+            </script>
+        </body>
+        </html>
+        """
+        
+        return html
+    
+    def generate_quick_links_html(self):
+        """生成快速链接的HTML"""
+        html = ""
+        for link in self.quick_links:
+            html += f"""
+            <div class="quick-link" data-url="{link['url']}">
+                <div class="quick-link-icon">
+                    <img src="{link['icon']}" alt="{link['name']}" 
+                         onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain={link['url'].split('//')[1].split('/')[0] if '//' in link['url'] else link['url']}&sz=32'">
+                </div>
+                <div class="quick-link-name">{link['name']}</div>
+            </div>
+            """
+        return html
