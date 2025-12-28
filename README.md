@@ -18,7 +18,7 @@
 
 4、依次运行：
 ```bash
-qmake /*根目录下的.pro文件的文件名*/.pro
+qmake 根目录下的.pro文件的文件名.pro
 ```
 
 ```bash
