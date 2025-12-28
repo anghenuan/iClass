@@ -4,9 +4,11 @@
 
 1、打开MSYS2 **MINGW64**终端
 
-2、进入程序根目录
+2、安装依赖库
 
-3、依次运行：
+3、进入程序根目录
+
+4、依次运行：
 ```bash
 qmake inequality_solver_qt.pro
 ```
@@ -15,4 +17,4 @@ qmake inequality_solver_qt.pro
 make
 ```
 
-4、运行`./release/InequalitySolver.exe`
+5、运行`./release/InequalitySolver.exe`
