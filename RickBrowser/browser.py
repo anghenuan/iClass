@@ -50,7 +50,7 @@ class Browser(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("RickBrowser")
+        self.setWindowTitle("Rick浏览器")
         self.setGeometry(100, 100, 1400, 900)
         
         # 设置应用图标
@@ -145,13 +145,32 @@ class Browser(QMainWindow):
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                     stop:0 #f8f8f8, stop:1 #e8e8e8);
             }
+            /* 使用CSS绘制关闭按钮（"×"符号） */
             QTabBar::close-button {
-                image: url(icons/close.png);
-                subcontrol-origin: padding;
+                image: none;
                 subcontrol-position: right;
+                subcontrol-origin: padding;
+                width: 16px;
+                height: 16px;
+                margin: 2px;
             }
-            QTabBar::close-button:hover {
-                image: url(icons/close_hover.png);
+            QTabBar::close-button::after {
+                content: "×";
+                color: #777;
+                font-size: 12px;
+                font-weight: bold;
+                line-height: 16px;
+            }
+            QTabBar::close-button:hover::after {
+                content: "×";
+                color: white;
+                background-color: #ff4444;
+                border-radius: 2px;
+                padding: 1px;
+            }
+            /* 为标签页添加关闭按钮间距 */
+            QTabBar::tab {
+                padding-right: 30px;
             }
         """)
         main_layout.addWidget(self.tabs)
@@ -1423,6 +1442,33 @@ class Browser(QMainWindow):
                 QTabBar::tab:hover {
                     background: #3e3e42;
                 }
+                /* 使用CSS绘制关闭按钮（"×"符号） */
+                QTabBar::close-button {
+                    image: none;
+                    subcontrol-position: right;
+                    subcontrol-origin: padding;
+                    width: 16px;
+                    height: 16px;
+                    margin: 2px;
+                }
+                QTabBar::close-button::after {
+                    content: "×";
+                    color: #777;
+                    font-size: 12px;
+                    font-weight: bold;
+                    line-height: 16px;
+                }
+                QTabBar::close-button:hover::after {
+                    content: "×";
+                    color: white;
+                    background-color: #ff4444;
+                    border-radius: 2px;
+                    padding: 1px;
+                }
+                /* 为标签页添加关闭按钮间距 */
+                QTabBar::tab {
+                    padding-right: 30px;
+                }
                 QStatusBar {
                     background: #007acc;
                     color: white;
@@ -1509,6 +1555,33 @@ class Browser(QMainWindow):
                 QTabBar::tab:hover {
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #f8f8f8, stop:1 #e8e8e8);
+                }
+                /* 使用CSS绘制关闭按钮（"×"符号） */
+                QTabBar::close-button {
+                    image: none;
+                    subcontrol-position: right;
+                    subcontrol-origin: padding;
+                    width: 16px;
+                    height: 16px;
+                    margin: 2px;
+                }
+                QTabBar::close-button::after {
+                    content: "×";
+                    color: #777;
+                    font-size: 12px;
+                    font-weight: bold;
+                    line-height: 16px;
+                }
+                QTabBar::close-button:hover::after {
+                    content: "×";
+                    color: white;
+                    background-color: #ff4444;
+                    border-radius: 2px;
+                    padding: 1px;
+                }
+                /* 为标签页添加关闭按钮间距 */
+                QTabBar::tab {
+                    padding-right: 30px;
                 }
                 QStatusBar {
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
