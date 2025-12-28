@@ -25,4 +25,4 @@ qmake /*根目录下的.pro文件的文件名*/.pro
 make
 ```
 
-5、运行`./release`目录下的.exe文件。
+5、运行/release目录下的.exe文件。
